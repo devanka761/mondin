@@ -6,8 +6,13 @@ export type ValidateArr = string[]
 
 type PossibleValue = string | number | boolean
 
-type PossibleData = {
-  [key: string]: PossibleValue | PossibleData
-}
+// type PossibleData = {
+//   [key: string]: PossibleValue | PossibleData
+// }
 
-export type PayloadData = PossibleData
+export type PayloadData = {
+  [key: string]: PossibleValue | PossibleValue[] | PayloadData | PayloadData[]
+}
+// type TempData = {
+//   [key: string]: string | number | boolean | null | TempData;
+// };

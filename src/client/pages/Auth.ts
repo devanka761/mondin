@@ -3,6 +3,8 @@ import kelement from "../helper/kelement"
 import * as klang from "../helper/lang"
 import modal from "../helper/modal"
 import xhr from "../helper/xhr"
+import chats from "../pm/center/chats"
+import headerBar from "../pm/header/HeaderBar"
 import { KiriminHttpResponse, LangObject, Languages } from "../types/helper.types"
 
 let lang: LangObject = {}
@@ -61,7 +63,9 @@ export default class Auth {
       return this.writeForm()
     }
     this.el.remove()
-    console.log("you're authorized")
+    auth_container?.remove()
+    headerBar.run()
+    chats.run()
   }
   writeForm(): void {
     auth_container = this.el

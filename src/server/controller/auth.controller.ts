@@ -112,9 +112,9 @@ export function processThirdParty(s: { user: PayloadData; provider: string }): P
   )
   if (!ukey) {
     ukey = "7" + rNumber(5).toString() + (Object.keys(udb).length + 1).toString()
-    db.ref.u[ukey] = { id: ukey, data: [data.user.data] }
-    db.save("u")
   }
+  db.ref.u[ukey] = { id: ukey, data: [data.user.data] }
+  db.save("u")
   data.user.id = ukey
   return { code: 200, data: { user: { id: data.user.id, data: <PayloadData>data.user.data } } }
 }

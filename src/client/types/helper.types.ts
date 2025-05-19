@@ -65,3 +65,9 @@ export interface KelementAttr {
   child?: SSKelement | string | (SSKelement | string)[]
   e?: SSKelement | string | (SSKelement | string)[]
 }
+
+type PossibleValue = string | number | boolean
+
+export type KJSON = {
+  [key: string]: PossibleValue | PossibleValue[] | KJSON | KJSON[]
+}
