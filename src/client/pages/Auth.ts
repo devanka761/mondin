@@ -3,9 +3,14 @@ import kelement from "../helper/kelement"
 import * as klang from "../helper/lang"
 import modal from "../helper/modal"
 import xhr from "../helper/xhr"
-import chats from "../pm/center/chats"
+import Chats from "../pm/center/Chats"
+import Account from "../pm/content/Account"
+import { AccountDB } from "../../server/types/account.types"
+// import Empty from "../pm/content/Empty"
 import headerBar from "../pm/header/HeaderBar"
+import Nav from "../pm/header/Nav"
 import { KiriminHttpResponse, LangObject, Languages } from "../types/helper.types"
+import { db } from "../manager/db"
 
 let lang: LangObject = {}
 
@@ -23,10 +28,9 @@ function loginProvider(provider: LoginProvider): HTMLElement {
 
   // btn.innerHTML = `<a href="/x/auth/${ProviderObject[provider]}" class="btn btn-${ProviderObject[provider]}"><i class="fa-brands fa-${ProviderObject[provider]}"></i> ${ProviderObject[provider]} Login</a>`
 
-  const btn = kelement("div", { c: "inp" })
+  const btn = kelement("div", "inp")
   btn.append(
-    kelement("a", {
-      c: `btn btn-${ProviderObject[provider]}`,
+    kelement("a", `btn btn-${ProviderObject[provider]}`, {
       a: { href: `/x/auth/${ProviderObject[provider]}` },
       e: `<i class="fa-brands fa-${ProviderObject[provider]}"></i> ${ProviderObject[provider]} Login`
     })
@@ -50,7 +54,7 @@ let auth_container: HTMLDivElement | null = null
 export default class Auth {
   private el: HTMLDivElement
   crateElement(): void {
-    this.el = kelement("div", { c: "Auth" })
+    this.el = kelement("div", "Auth")
     this.el.innerHTML = `<div class="none"><i class="fa-solid fa-map"></i> <i class="fa-regular fa-map"></i> <i class="fa-light fa-map"></i> <i class="fa-thin fa-map"></i> <i class="fa-duotone fa-solid fa-map"></i> <i class="fa-duotone fa-regular fa-map"></i> <i class="fa-duotone fa-light fa-map"></i> <i class="fa-duotone fa-thin fa-map"></i> <i class="fa-sharp fa-solid fa-map"></i> <i class="fa-brands fa-font-awesome"></i> <i class="fa-sharp fa-regular fa-map"></i> <i class="fa-sharp fa-light fa-map"></i> <i class="fa-sharp fa-thin fa-map"></i> <i class="fa-sharp-duotone fa-solid fa-map"></i> <i class="fa-sharp-duotone fa-regular fa-map"></i> <i class="fa-sharp-duotone fa-light fa-map"></i> <i class="fa-sharp-duotone fa-thin fa-map"></i></div>`
   }
   async checkUser(): Promise<void> {
@@ -62,10 +66,19 @@ export default class Auth {
       this.el.querySelector(".none")?.remove()
       return this.writeForm()
     }
+    this.initializeData(isUser.data ?? {})
     this.el.remove()
     auth_container?.remove()
     headerBar.run()
-    chats.run()
+    new Chats().run()
+    new Nav().run()
+    // new Empty().run()
+    new Account().run()
+  }
+  initializeData(s: AccountDB): void {
+    if (s.me) db.me = s.me
+    // const clientData = new ClientData({ id: k });
+    // clientData.init(cloud_hb.s[k]);
   }
   writeForm(): void {
     auth_container = this.el
@@ -87,7 +100,7 @@ class SignEmail {
     this.isLocked = false
   }
   createElement(): void {
-    this.el = kelement("div", { c: "box" })
+    this.el = kelement("div", "box")
     this.el.innerHTML = `
     <div class="top">
       <p>KIRIMIN</p>
@@ -192,7 +205,7 @@ class SignCode {
     this.isLocked = false
   }
   createElement(): void {
-    this.el = kelement("div", { c: "box" })
+    this.el = kelement("div", "box")
     this.el.innerHTML = `
     <div class="top">
       <p>KIRIMIN</p>

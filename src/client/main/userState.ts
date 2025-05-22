@@ -1,12 +1,12 @@
-import { UserInstance, UserLocked, UserNotif } from "../types/userState.types"
+import { PrimaryClass, UserLocked, UserNotif } from "../types/userState.types"
 
 class UserState {
   private notif: UserNotif
   private color: "dark" | "light"
-  private currtab: UserInstance
-  private currcenter: UserInstance
-  private currcontent: UserInstance
-  private currlast: UserInstance
+  public currtab: PrimaryClass | null
+  public currcenter: PrimaryClass | null
+  public currcontent: PrimaryClass | null
+  public currlast: PrimaryClass | null
   public locked: UserLocked
   constructor() {
     this.color = "dark"
@@ -17,32 +17,32 @@ class UserState {
     this.currlast = null
     this.locked = { currtab: false, currcenter: false, currcontent: false }
   }
-  set tab(newtab: UserInstance) {
+  set tab(newtab: PrimaryClass | null) {
     this.currlast = newtab
     this.currtab = newtab
   }
-  get tab(): UserInstance {
+  get tab(): PrimaryClass | null {
     return this.currtab
   }
-  set center(newcenter: UserInstance) {
+  set center(newcenter: PrimaryClass | null) {
     this.currlast = newcenter
     this.currcenter = newcenter
   }
-  get center(): UserInstance {
+  get center(): PrimaryClass | null {
     return this.currcenter
   }
-  set content(newcontent: UserInstance) {
+  set content(newcontent: PrimaryClass | null) {
     this.currlast = newcontent
     this.currcontent = newcontent
   }
-  get content(): UserInstance {
+  get content(): PrimaryClass | null {
     return this.currcontent
   }
-  set last(newlast: UserInstance) {
+  set last(newlast: PrimaryClass | null) {
     this.currlast = newlast
     this.currlast = newlast
   }
-  get last(): UserInstance {
+  get last(): PrimaryClass | null {
     return this.currlast
   }
 }

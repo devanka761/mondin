@@ -1,10 +1,6 @@
 @use "../../variables" as v;
 
-.chats {
-  position: absolute;
-  top: 50px;left: 100px;
-  width: 350px;
-  height: calc(100% - 50px);
+.Chats {
   background-color: v.$card_secondary;
   overflow-y: auto;
   overflow-x: hidden;

@@ -1,4 +1,4 @@
-import { klang, lang } from "./lang"
+import { lang } from "./lang"
 
 export default {
   sameday(t1: number | Date, t2: number | Date): boolean {

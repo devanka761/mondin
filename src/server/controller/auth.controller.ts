@@ -7,13 +7,11 @@ import { PayloadData } from "../types/validate.types"
 import cfg from "../main/cfg"
 import { TempUserData, UserUID, ValidProviders } from "../types/binder.types"
 import { UserProcess } from "../types/db.types"
+import * as haccount from "./account.controller"
 
-export function isLogged(uid: UserUID | undefined) {
+export function isLogged(uid?: UserUID) {
   if (!uid) return { code: 400 }
-  const user = db.ref.u[uid]
-  if (!user) return { code: 401, msg: "UNAUTHORIZED" }
-  const data = { id: uid }
-  return { code: 200, data }
+  return haccount.getMe(uid)
 }
 
 export function login(s: PayloadData): PayloadData {
@@ -112,8 +110,11 @@ export function processThirdParty(s: { user: PayloadData; provider: string }): P
   )
   if (!ukey) {
     ukey = "7" + rNumber(5).toString() + (Object.keys(udb).length + 1).toString()
+    db.ref.u[ukey] = { id: ukey, data: [data.user.data] }
+    db.ref.u[ukey].uname = `u${ukey}`
+    db.ref.u[ukey].dname = `User ${ukey}`
   }
-  db.ref.u[ukey] = { id: ukey, data: [data.user.data] }
+  db.ref.u[ukey].data = [data.user.data]
   db.save("u")
   data.user.id = ukey
   return { code: 200, data: { user: { id: data.user.id, data: <PayloadData>data.user.data } } }

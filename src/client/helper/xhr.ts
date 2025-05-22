@@ -1,7 +1,7 @@
 import { KiriminHttpResponse } from "../types/helper.types"
 
 export default {
-  request(method: string, url: string, s: object = {}, el: string | null = null): Promise<KiriminHttpResponse> {
+  request(method: string, url: string, s: object = {}, el?: boolean): Promise<KiriminHttpResponse> {
     return new Promise((resolve) => {
       const xhr: XMLHttpRequest = new XMLHttpRequest()
       xhr.open(method, url)
@@ -9,7 +9,7 @@ export default {
 
       if (el)
         xhr.upload.onprogress = ({ loaded, total }) => {
-          const elpr: HTMLElement | null = document.querySelector(el)
+          const elpr: HTMLElement | null = document.querySelector(".loading .box p")
           const progress: number = Math.floor((loaded / total) * 100)
           if (elpr) {
             const spanpr: HTMLElement = elpr?.querySelector("span") || document.createElement("span")
@@ -37,10 +37,10 @@ export default {
       }
     })
   },
-  async get(ref: string) {
+  async get(ref: string): Promise<KiriminHttpResponse> {
     return await this.request("GET", ref)
   },
-  async post(ref: string, s: object | null = {}, el: string | null = null) {
+  async post(ref: string, s: object | null = {}, el?: boolean): Promise<KiriminHttpResponse> {
     return await this.request("POST", ref, s, el)
   }
 }

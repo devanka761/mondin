@@ -16,12 +16,11 @@ class HeaderBar {
     this.isLocked = false
   }
   createElement(): void {
-    this.el = kelement("div", { c: "header" })
-    this.apptitle = kelement("div", { c: "title", e: "KIRIMIN" })
-    this.eactions = kelement("div", { c: "actions" })
-    this.btn_find = kelement("div", { c: "btn btn-find", e: `<i class="fa-solid fa-fw fa-magnifying-glass"></i>` })
-    this.btn_settings = kelement("div", {
-      c: "btn btn-settings",
+    this.el = kelement("div", "header")
+    this.apptitle = kelement("div", "title", { e: "KIRIMIN" })
+    this.eactions = kelement("div", "actions")
+    this.btn_find = kelement("div", "btn btn-find", { e: `<i class="fa-solid fa-fw fa-magnifying-glass"></i>` })
+    this.btn_settings = kelement("div", "btn btn-settings", {
       e: `<i class="fa-solid fa-fw fa-ellipsis-vertical"></i>`
     })
     this.el.append(this.apptitle, this.eactions)

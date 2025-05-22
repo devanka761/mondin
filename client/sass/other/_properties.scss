@@ -106,6 +106,12 @@ $bg: #3f464e;
         word-break: break-word;
         hyphens: auto;
       }
+      img {
+        margin: 0 auto;
+        margin-top: 10px;
+        max-width: 100%;
+        max-height: 300px;
+      }
       input[type="text"], textarea {
         margin-top: 10px;
         width: 100%;

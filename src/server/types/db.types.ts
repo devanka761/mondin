@@ -17,6 +17,11 @@ export interface UserProcess {
 
 export interface UserTemp {
   id: string
+  img?: string
+  uname?: string
+  dname?: string
+  bio?: string
+  b?: number[]
   data: TempUserDatum
   peer?: string
   zzz?: PossibleData[]
@@ -25,7 +30,6 @@ export interface UserTemp {
 export interface UserFixed extends UserTemp {
   id: string
   uname: string
-  email: string
   dname: string
   data: SessionUserDatum
   b?: number[]

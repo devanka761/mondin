@@ -53,6 +53,7 @@
   "ACC_DISPLAYNAME": "Display name baru",
   "ACC_BIO": "About me Baru",
   "ACC_IMG": "Konfirmasi upload foto profil baru?",
+  "ACC_NOBIO": "Belum ada bio.",
   "ACC_FAIL_UNAME_FORMAT": "Username hanya bisa berisi huruf, angka, underscore(_), dan titik(.)",
   "ACC_FAIL_UNAME_LENGTH": "Panjang username harus diantara 4 - 20 karakter",
   "ACC_FAIL_CLAIMED": "Usernamenya udah ada yang pake",

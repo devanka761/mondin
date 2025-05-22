@@ -2,16 +2,16 @@ import culement from "../../helper/culement"
 import kelement from "../../helper/kelement"
 import { lang } from "../../helper/lang"
 import modal from "../../helper/modal"
-import sceneIn from "../../helper/sceneIn"
 import { escapeHTML, ss } from "../../helper/escaper"
 import userState from "../../main/userState"
 import { db } from "../../manager/db"
-import { ChatCard, ChatLastChat, ChatUser } from "../../types/chats.types"
-import { KJSON } from "../../types/helper.types"
+import { ChatCard } from "../../types/chats.types"
 import sdate from "../../helper/sdate"
+import { PrimaryClass } from "../../types/userState.types"
+import { ChatDB, ChatsDB } from "../../types/db.types"
 
-function transpile_lastchat(s: ChatLastChat): string {
-  const myId = (<KJSON>db.user)?.id
+function transpile_lastchat(s: ChatDB): string {
+  const myId = <string>db.me.id
   let text = ""
 
   if (s.type === "deleted") {
@@ -32,8 +32,8 @@ function transpile_lastchat(s: ChatLastChat): string {
   }
 
   if (s.userid === myId) {
-    const isRead: boolean = s.watch.filter((usrid) => usrid !== myId).length >= 1
-    const readStatus = kelement("i", { c: `fa-regular fa-check${isRead ? "-double" : ""}` })
+    const isRead: boolean = (s.watch || []).filter((usrid) => usrid !== myId)?.length >= 1
+    const readStatus = kelement("i", `fa-regular fa-check${isRead ? "-double" : ""}`)
     text = readStatus + text
   }
 
@@ -47,20 +47,20 @@ function dateTime(timestamp: number): string {
 
 function chat_card(s: ChatCard): { [key: string]: HTMLDivElement } {
   const { user, lastchat, unread } = s
-  const card = kelement("div", { c: "card" })
-  const eleft = kelement("div", { c: "left" })
-  const eright = kelement("div", { c: "right" })
-  const ecimg = kelement("div", { c: "img" })
+  const card = kelement("div", "card")
+  const eleft = kelement("div", "left")
+  const eright = kelement("div", "right")
+  const ecimg = kelement("div", "img")
   const img = new Image()
   img.alt = user.username
-  img.src = user.photo || "/assets/user.jpg"
+  img.src = user.image || "/assets/user.jpg"
   img.width = 50
-  const edetail = kelement("div", { c: "detail" })
-  const eusername = kelement("div", { c: "name", e: `<div class="name"><p>Devanka</p></div>` })
-  const elastchat = kelement("div", { c: "last", e: transpile_lastchat(lastchat) })
+  const edetail = kelement("div", "detail")
+  const eusername = kelement("div", "name", { e: `<div class="name"><p>Devanka</p></div>` })
+  const elastchat = kelement("div", "last", { e: transpile_lastchat(lastchat) })
 
-  const elastts = kelement("div", { c: "last", e: dateTime(s.lastchat.timestamp) })
-  const eunread = kelement("div", { c: "unread", e: unread.toString() })
+  const elastts = kelement("div", "last", { e: dateTime(s.lastchat.timestamp) })
+  const eunread = kelement("div", "unread", { e: unread.toString() })
 
   card.append(eleft, eright)
   eleft.append(ecimg, edetail)
@@ -71,9 +71,9 @@ function chat_card(s: ChatCard): { [key: string]: HTMLDivElement } {
   return { card, eusername, elastchat, elastts, eunread }
 }
 
-class Chats {
+export default class Chats implements PrimaryClass {
   readonly id: string
-  private isLocked: boolean
+  public isLocked: boolean
   private el: HTMLDivElement
   private card_list: HTMLDivElement
   constructor() {
@@ -81,73 +81,77 @@ class Chats {
     this.isLocked = false
   }
   createElement(): void {
-    this.el = kelement("div", { c: "chats" })
-    this.card_list = kelement("div", { c: "card-list" })
+    this.el = kelement("div", "Chats pmcenter")
+    this.card_list = kelement("div", "card-list")
     this.el.append(this.card_list)
   }
   btnListener(): void {}
   writeChatList(): void {
-    const cdb = Object.values(db.chats || {}).sort((a, b) => {
-      const cdba = Object.values(a.chats)
-      const cdbb = Object.values(b.chats)
-      if ((<KJSON>cdba[cdba.length - 1])?.ts > (<KJSON>cdbb[cdbb.length - 1])?.ts) return 1
-      if ((<KJSON>cdba[cdba.length - 1])?.ts < (<KJSON>cdbb[cdbb.length - 1])?.ts) return -1
+    const cdb: ChatsDB[] = Object.values(db.c || {}).sort((a, b) => {
+      const cdba = Object.values(a.c)
+      const cdbb = Object.values(b.c)
+      if (cdba[cdba.length - 1].timestamp > cdbb[cdbb.length - 1].timestamp) return 1
+      if (cdba[cdba.length - 1].timestamp < cdbb[cdbb.length - 1].timestamp) return -1
       return 0
     })
-
     cdb.forEach((ch) => {
-      const user = <ChatUser>ch.user
-      const inbox = Object.values(ch.chats)
-      const unread = inbox.filter((cht) => {
-        const ct = cht as KJSON
-        return (
-          ct.u !== (<KJSON>db.user).id &&
-          ct.type !== "deleted" &&
-          !(<string[]>ct.w).includes(<string>(<KJSON>db.user).id)
-        )
+      const user = ch.u
+      const inbox = Object.values(ch.c)
+      const unread = inbox.filter((ct) => {
+        return ct.userid !== db.me.id && ct.type !== "deleted" && !ct.watch?.includes(<string>db.me.id)
       }).length
 
-      const lastchat = <ChatLastChat>inbox[inbox.length - 1]
+      const lastchat = inbox[inbox.length - 1]
       const { card } = chat_card({ user, lastchat, unread })
       this.card_list.append(card)
     })
 
     // THESE ARE ONLY FOR PLACEHOLDER TO CHECK THE CSS STYLES
-    const { card } = chat_card({
-      user: { userid: "666666", username: "Rudi02" },
-      lastchat: {
-        timestamp: 1747678809977,
-        type: "text",
-        userid: "666666",
-        watch: [],
-        text: "Hehehe"
-      },
-      unread: 1
-    })
-    this.card_list.append(card)
+    // const { card } = chat_card({
+    //   user: { userid: "666666", username: "Rudi02" },
+    //   lastchat: {
+    //     timestamp: 1747678809977,
+    //     type: "text",
+    //     userid: "666666",
+    //     watch: [],
+    //     text: "Hehehe"
+    //   },
+    //   unread: 1
+    // })
+    // this.card_list.append(card)
+
+    this.writeIfEmpty(cdb)
   }
-  fRemove(): void {
-    this.isLocked = false
-    userState.center = null
-    userState.last = null
-    this.el.remove()
+  writeIfEmpty(cdb: ChatsDB[]): void {
+    const oldNomore: HTMLParagraphElement | null = document.querySelector(".nomore")
+    if (cdb.length < 1) {
+      if (oldNomore) return
+      const nomore = kelement("p", "nomore", { e: `${lang.CHTS_NOCHAT}<br/>${lang.CHTS_PLS}` })
+      this.card_list.append(nomore)
+    } else {
+      if (oldNomore) oldNomore.remove()
+    }
   }
   async destroy(): Promise<void> {
-    this.el.classList.add("out")
-    await modal.waittime()
+    const useanim = true
+    if (useanim) {
+      this.el.classList.add("out")
+      await modal.waittime()
+    }
     this.el.remove()
     this.isLocked = false
     userState.center = null
     userState.last = null
+    // const useanim = true
+    // if (useanim) return await this.sdestroy()
+    // else return this.fdestroy()
   }
+  update(): void {}
   run(): void {
     userState.center = this
     this.createElement()
     culement.app().append(this.el)
-    sceneIn(this.el)
     this.writeChatList()
     this.btnListener()
   }
 }
-
-export default new Chats()

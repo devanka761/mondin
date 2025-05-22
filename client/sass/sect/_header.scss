@@ -11,7 +11,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  animation: slide_down_in 0.5s;
   .title {
     padding: 10px;
     font-weight: bold;
@@ -43,8 +42,8 @@
         background-color: v.$blurple;
       }
     }
-    &.out {
-      animation: slide_down_out 0.25s forwards;
-    }
+    // &.out {
+    //   animation: slide_down_out 0.25s forwards;
+    // }
   }
 }

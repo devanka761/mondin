@@ -1,16 +1,8 @@
 import { KelementAttr, SSKelement } from "../types/helper.types"
 
-const classAliases = ["class", ".", "c"] as const
 const idAliases = ["id", "#"] as const
 const childAliases = ["child", "e"] as const
 const attrAliases = ["a", "attr"] as const
-
-function getClassValue(cla: KelementAttr): string | undefined {
-  for (const key of classAliases) {
-    if (key in cla) return cla[key as string]
-  }
-  return undefined
-}
 
 function getIdValue(cla: KelementAttr): string | undefined {
   for (const key of idAliases) {
@@ -36,6 +28,7 @@ function getChildValue(cla: KelementAttr): (keyof SSKelement | string)[] | undef
 // }
 export default function kelement<KelementTag extends keyof HTMLElementTagNameMap>(
   tagName: KelementTag,
+  className?: string | null,
   prop?: KelementAttr
 ): HTMLElementTagNameMap[KelementTag] {
   const el = document.createElement(tagName)
@@ -46,12 +39,7 @@ export default function kelement<KelementTag extends keyof HTMLElementTagNameMap
       if (idVal) el.id = idVal
     }
   })
-  classAliases.forEach((alias) => {
-    if (prop?.[alias]) {
-      const classVal = getClassValue({ [alias]: prop[alias] })
-      if (classVal) el.setAttribute("class", classVal)
-    }
-  })
+  if (className) el.setAttribute("class", className)
   attrAliases.forEach((alias) => {
     if (prop?.[alias]) {
       const attrVal = getAttrValue({ [alias]: prop[alias] })

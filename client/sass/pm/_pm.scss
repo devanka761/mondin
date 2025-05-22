@@ -1,0 +1,12 @@
+.pmcenter {
+  position: absolute;
+  top: 50px;left: 100px;
+  width: 350px;
+  height: calc(100% - 50px);
+}
+.pmcontent {
+  position: absolute;
+  top: 0;left: calc(350px + 100px);
+  width: calc(100% - (350px + 100px));
+  height: 100%;
+}

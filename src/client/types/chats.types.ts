@@ -1,9 +1,11 @@
+import { ChatDB, UserDB } from "./db.types"
+
 export type ChatType = "text" | "audio" | "image" | "video" | "call" | "file" | "deleted"
 export interface ChatUser {
   username: string
-  userid: string
+  id: string
   photo?: string
-  badges?: string[]
+  badges?: number[]
 }
 export interface ChatLastChat {
   userid: string
@@ -13,7 +15,7 @@ export interface ChatLastChat {
   watch: string[]
 }
 export interface ChatCard {
-  user: ChatUser
-  lastchat: ChatLastChat
+  user: UserDB
+  lastchat: ChatDB
   unread: number
 }

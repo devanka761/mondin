@@ -10,14 +10,12 @@ const modal = {
   async loading(
     newfunc: Promise<object | string | number | void>,
     msg: string = "LOADING"
-  ): Promise<KiriminHttpResponse | object> {
-    const el = kelement("div", {
-      c: "loading",
-      e: kelement("div", {
-        c: "box",
+  ): Promise<KiriminHttpResponse> {
+    const el = kelement("div", "loading", {
+      e: kelement("div", "box", {
         e: [
-          kelement("div", { c: "spinner", e: kelement("i", { c: "fa-solid fa-circle-notch fa-spin" }) }),
-          kelement("div", { class: "msg", child: kelement("p", { child: msg }) })
+          kelement("div", "spinner", { e: kelement("i", "fa-solid fa-circle-notch fa-spin") }),
+          kelement("div", "msg", { e: kelement("p", null, { e: msg }) })
         ]
       })
     })
@@ -40,7 +38,7 @@ const modal = {
       })
   },
   element(): HTMLElement {
-    return kelement("div", { c: "modal" })
+    return kelement("div", "modal")
   },
   async alert(options: object | string): Promise<boolean> {
     return new Promise((resolve) => {
@@ -120,6 +118,17 @@ const modal = {
         </div>
       </div>`
 
+      if (s.img) {
+        const img = new Image()
+        img.src = s.img
+        el.querySelector(".box .inf").append(img)
+        img.onerror = async () => {
+          el.classList.add("out")
+          await this.waittime()
+          el.remove()
+          return resolve(await this.alert({ msg: lang.IMG_ERR, ic: "image-slash" }))
+        }
+      }
       const btnOk = el.querySelector(".acts .btn-ok")
       if (s.okx) btnOk.innerText = s.okx
       const btnCancel = el.querySelector(".acts .btn-cancel")
@@ -262,7 +271,7 @@ const modal = {
       const form = el.querySelector(".box .inf #modal-radio-form")
       const optionId: string = Date.now().toString(36)
       s.items.forEach((itm) => {
-        const radioInp = kelement("input", {
+        const radioInp = kelement("input", null, {
           a: {
             type: "radio",
             name: optionId,
@@ -272,12 +281,12 @@ const modal = {
             checked: itm.activated ? "true" : false
           }
         })
-        const radioLabel = kelement("label", {
+        const radioLabel = kelement("label", null, {
           a: { for: `${optionId}-${itm.id}` },
           e: [radioInp, `<p>${itm.label}</p>`]
         })
 
-        const radio = kelement("div", { c: "radio", e: radioLabel })
+        const radio = kelement("div", "radio", { e: radioLabel })
         form.append(radio)
       })
 

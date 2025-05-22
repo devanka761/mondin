@@ -1,3 +1,6 @@
-import { KJSON } from "../types/helper.types"
+import { Databases } from "../types/db.types"
 
-export const db: KJSON = {}
+export const db: Databases = {
+  c: {},
+  me: {}
+}

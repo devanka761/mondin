@@ -25,6 +25,7 @@ export interface ModalAlert extends ModalObject {
   ok?: VoidFunction
 }
 export interface ModalConfirm extends ModalAlert {
+  img?: string
   cancelx: string
   cancel?: VoidFunction
 }
@@ -71,3 +72,5 @@ type PossibleValue = string | number | boolean
 export type KJSON = {
   [key: string]: PossibleValue | PossibleValue[] | KJSON | KJSON[]
 }
+
+export type KJOLL = { [key: symbol | string]: () => PossibleValue | PossibleValue[] | KJSON | KJSON[] }
