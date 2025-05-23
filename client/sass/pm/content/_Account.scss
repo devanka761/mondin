@@ -45,6 +45,7 @@ $topheight: 60px;
     width: 100%;
     height: calc(100% - $topheight);
     padding: 20px;
+    scrollbar-width: thin;
     overflow-y: auto;
     .chp {
       width: 100%;

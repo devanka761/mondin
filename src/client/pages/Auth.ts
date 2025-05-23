@@ -137,8 +137,8 @@ class SignEmail {
   formListener(): void {
     const eProviders: HTMLElement = this.el.querySelector(".other-providers") as HTMLElement
     Object.keys(config)
-      .filter((k) => k.includes("USE_OAUTH") && config[k] === true)
-      .forEach((k) => {
+      .filter(k => k.includes("USE_OAUTH") && config[k] === true)
+      .forEach(k => {
         eProviders.append(loginProvider(k as LoginProvider))
       })
 
@@ -163,16 +163,14 @@ class SignEmail {
       await this.destroy()
       new SignEmail({ email: this.email }).run()
     }
-    form.onsubmit = async (e) => {
+    form.onsubmit = async e => {
       e.preventDefault()
       if (this.isLocked) return
       this.isLocked = true
       const data = {}
       const formData = new FormData(form)
       formData.forEach((val, k) => (data[k] = val.toString()))
-      const userLogin: KiriminHttpResponse = (await modal.loading(
-        xhr.post("/x/auth/sign-in", data)
-      )) as KiriminHttpResponse
+      const userLogin: KiriminHttpResponse = (await modal.loading(xhr.post("/x/auth/sign-in", data))) as KiriminHttpResponse
       if (!userLogin.ok) {
         await modal.alert(lang[userLogin.msg] || lang.ERROR)
         this.isLocked = false
@@ -278,16 +276,14 @@ class SignCode {
       new SignEmail({ email: this.email }).run()
     }
     const form: HTMLFormElement = this.el.querySelector("#verify-form") as HTMLFormElement
-    form.onsubmit = async (e) => {
+    form.onsubmit = async e => {
       e.preventDefault()
       if (this.isLocked) return
       this.isLocked = true
       const data = {}
       const formData = new FormData(form)
       formData.forEach((val, k) => (data[k] = val))
-      const userLogin: KiriminHttpResponse = (await modal.loading(
-        xhr.post("/x/auth/verify", data)
-      )) as KiriminHttpResponse
+      const userLogin: KiriminHttpResponse = (await modal.loading(xhr.post("/x/auth/verify", data))) as KiriminHttpResponse
       if (!userLogin.ok) {
         await modal.alert(lang[userLogin.msg] || lang.ERROR)
         this.isLocked = false
@@ -296,6 +292,7 @@ class SignCode {
       this.isLocked = false
       await this.destroy()
       auth_container?.remove()
+      new Auth().run()
     }
   }
   async destroy(): Promise<void> {

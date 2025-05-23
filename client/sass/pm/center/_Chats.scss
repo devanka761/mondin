@@ -2,6 +2,7 @@
 
 .Chats {
   background-color: v.$card_secondary;
+  scrollbar-width: thin;
   overflow-y: auto;
   overflow-x: hidden;
   .search {

@@ -23,38 +23,30 @@
 
 @keyframes slide_left_in {
   0% {
-    opacity: 0;
     transform: translateX(100%);
   } 100% {
-    opacity: 1;
     transform: translateX(0);
   }
 }
 @keyframes slide_left_out {
   0% {
-    opacity: 1;
     transform: translateX(0);
   } 100% {
-    opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(-100%);
   }
 }
 @keyframes slide_right_in {
   0% {
-    opacity: 0;
     transform: translateX(-100%);
   } 100% {
-    opacity: 1;
     transform: translateX(0);
   }
 }
 @keyframes slide_right_out {
   0% {
-    opacity: 1;
     transform: translateX(0);
   } 100% {
-    opacity: 0;
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
 }
 @keyframes slide_up_in {

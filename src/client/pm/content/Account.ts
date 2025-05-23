@@ -2,6 +2,7 @@ import culement from "../../helper/culement"
 import kelement from "../../helper/kelement"
 import { lang } from "../../helper/lang"
 import modal from "../../helper/modal"
+import sdate from "../../helper/sdate"
 import setbadge from "../../helper/setbadge"
 import xhr from "../../helper/xhr"
 import userState from "../../main/userState"
@@ -66,7 +67,7 @@ export default class Account implements PrimaryClass {
         </div>
       </div>
       <div class="chp usersign">
-        <p><a class="logout" href="/logout"><i class="fa-light fa-triangle-exclamation"></i> LOG OUT</a></p>
+        <p><a class="logout" href="/x/auth/logout"><i class="fa-light fa-triangle-exclamation"></i> LOG OUT</a></p>
       </div>
     </div>`
   }
@@ -79,7 +80,7 @@ export default class Account implements PrimaryClass {
   }
   btnListener(): void {
     const elogout = <HTMLAnchorElement>this.el.querySelector(".usersign a.logout")
-    elogout.onclick = async (e) => {
+    elogout.onclick = async e => {
       e.preventDefault()
       if (this.isLocked) return
       this.isLocked = true
@@ -113,7 +114,7 @@ export default class Account implements PrimaryClass {
       }
       const setUname = await modal.loading(xhr.post("/x/account/set-username", { uname: getUname }))
       if (setUname?.code === 429) {
-        await modal.alert(`${lang.ACC_FAIL_UNAME_COOLDOWN}<br/><b>${new Date(setUname.msg).toLocaleString()}</b>`)
+        await modal.alert(`${lang.ACC_FAIL_UNAME_COOLDOWN}<br/><b>${sdate.remain(<number>setUname.data?.timestamp)?.toLocaleString() || "0"}</b>`)
         this.isLocked = false
         return
       }
@@ -148,7 +149,7 @@ export default class Account implements PrimaryClass {
       }
       const setDname = await modal.loading(xhr.post("/x/account/set-displayname", { dname: getDname }))
       if (setDname?.code === 429) {
-        await modal.alert(`${lang.ACC_FAIL_DNAME_COOLDOWN}<br/><b>${new Date(setDname.msg).toLocaleString()}</b>`)
+        await modal.alert(`${lang.ACC_FAIL_DNAME_COOLDOWN}<br/><b>${sdate.remain(<number>setDname.data?.timestamp)?.toLocaleString() || "0"}</b>`)
         this.isLocked = false
         return
       }
@@ -183,7 +184,7 @@ export default class Account implements PrimaryClass {
       }
       const setBio = await modal.loading(xhr.post("/x/account/set-bio", { bio: getBio }))
       if (setBio?.code === 429) {
-        await modal.alert(`${lang.ACC_FAIL_BIO_COOLDOWN}<br/><b>${new Date(setBio.msg).toLocaleString()}</b>`)
+        await modal.alert(`${lang.ACC_FAIL_BIO_COOLDOWN}<br/><b>${sdate.remain(<number>setBio.data?.timestamp)?.toLocaleString() || "0"}</b>`)
         this.isLocked = false
         return
       }
@@ -217,7 +218,7 @@ export default class Account implements PrimaryClass {
           this.isLocked = false
           return
         }
-        const imgsrc = await new Promise((resolve) => {
+        const imgsrc = await new Promise(resolve => {
           const reader = new FileReader()
           reader.onload = () => {
             return resolve(reader.result)
@@ -225,10 +226,7 @@ export default class Account implements PrimaryClass {
           reader.readAsDataURL(file)
         })
 
-        const setImg = await modal.loading(
-          xhr.post("/x/account/set-img", { img: imgsrc, name: file.name }, true),
-          lang.UPLOADING
-        )
+        const setImg = await modal.loading(xhr.post("/x/account/set-img", { img: imgsrc, name: file.name }, true), lang.UPLOADING)
         if (setImg?.code === 413) {
           await modal.alert(lang.ACC_FILE_LIMIT.replace(/{SIZE}/g, "2.5MB"))
           this.isLocked = false
@@ -248,7 +246,7 @@ export default class Account implements PrimaryClass {
   }
   renImage(): void {
     const eimage = <HTMLDivElement>this.el.querySelector(".userphoto .outer-img")
-    if (eimage.lastChild) eimage.lastChild.remove()
+    if (eimage.firstChild) eimage.firstChild.remove()
     const img = new Image()
     img.onerror = () => (img.src = "/assets/user.jpg")
     img.src = db.me.image ? `/file/user/${db.me.image}` : "/assets/user.jpg"
@@ -270,16 +268,21 @@ export default class Account implements PrimaryClass {
   }
   renBio(): void {
     const ebio = <HTMLParagraphElement>this.el.querySelector(".userbio .outer .chp-f p")
-    ebio.innerText = db.me.bio ?? lang.ACC_NOBIO
+    ebio.innerText = db.me.bio || lang.ACC_NOBIO
   }
   renEmails(): void {
     const eemails = <HTMLParagraphElement>this.el.querySelector(".useremail .outer .chp-f")
-    db.me.email?.forEach((sid) => {
+    db.me.email?.forEach(sid => {
       eemails.append(kelement("p", null, { e: `${sid.email} - ${sid.provider}` }))
     })
   }
   update(): void | Promise<void> {}
-  async destroy(): Promise<void> {}
+  async destroy(): Promise<void> {
+    this.el.classList.add("out")
+    await modal.waittime()
+    this.isLocked = false
+    this.el.remove()
+  }
   run(): void {
     userState.content = this
     this.createElement()

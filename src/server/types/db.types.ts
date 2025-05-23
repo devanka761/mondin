@@ -1,4 +1,4 @@
-import { PossibleData, SessionUserDatum, TempUserData, TempUserDatum, UserUID } from "./binder.types"
+import { PossibleData, TempUserData, TempUserDatum, UserUID } from "./binder.types"
 
 export interface TemporaryAuth {
   email: string
@@ -10,12 +10,18 @@ export interface TemporaryAuth {
   cd?: number
 }
 
+export interface DBPerKey {
+  [key: string]: {
+    [key: string]: string | number | boolean
+  }
+}
+
 export interface UserProcess {
   id?: string
   data: TempUserData
 }
 
-export interface UserTemp {
+export interface User {
   id: string
   img?: string
   uname?: string
@@ -25,23 +31,13 @@ export interface UserTemp {
   data: TempUserDatum
   peer?: string
   zzz?: PossibleData[]
-}
-
-export interface UserFixed extends UserTemp {
-  id: string
-  uname: string
-  dname: string
-  data: SessionUserDatum
-  b?: number[]
-  bio?: string
   req?: UserUID[]
-  img?: string
   lu?: number
   ld?: number
   lb?: number
 }
 
-interface ChatObject {
+export interface ChatObject {
   u: UserUID
   ts: string
   w?: string[]
@@ -59,7 +55,8 @@ interface ChatObject {
 export interface Chat {
   u: UserUID[]
   f?: 1 | 0
-  c?: { [key: string]: ChatObject }
+  c?: string
+  // c?: { [key: string]: ChatObject }
 }
 
 export interface Group extends Chat {
@@ -94,7 +91,7 @@ export interface Call {
 }
 
 export type Databases = {
-  u: { [key: string]: UserFixed | UserTemp }
+  u: { [key: string]: User }
   t: { [key: string]: TemporaryAuth }
   c: { [key: string]: Chat }
   g: { [key: string]: Group }

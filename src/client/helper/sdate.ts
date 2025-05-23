@@ -1,6 +1,6 @@
 import { lang } from "./lang"
 
-export default {
+const sdate = {
   sameday(t1: number | Date, t2: number | Date): boolean {
     t1 = new Date(t1)
     t2 = new Date(t2)
@@ -11,6 +11,10 @@ export default {
   },
   date(ts: number = Date.now()): string {
     return new Date(ts).toLocaleDateString(navigator.language, { year: "2-digit", month: "2-digit", day: "2-digit" })
+  },
+  remain(expiryTime: number): string | null {
+    const remaining = expiryTime - Date.now()
+    return remaining > 0 ? sdate.durrTime(remaining) : null
   },
   datetime(ts: number = Date.now(), pq = null): string {
     return this.date(ts) + (pq ? " " + pq + " " : " ") + this.time(ts)
@@ -43,11 +47,15 @@ export default {
   },
   durrTime(ms: number): string {
     const totalSeconds = Math.floor(ms / 1000)
-    const hours = Math.floor(totalSeconds / 3600)
+    const days = Math.floor(totalSeconds / 3600 / 24)
+    const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600)
     const minutes = Math.floor((totalSeconds % 3600) / 60)
     const seconds = totalSeconds % 60
 
     let result = ""
+    if (days > 0) {
+      result += `${days}${lang.SDATE_sDAYS} `
+    }
     if (hours > 0) {
       result += `${hours}${lang.SDATE_sHOURS} `
     }
@@ -60,3 +68,5 @@ export default {
     return result.trim()
   }
 }
+
+export default sdate

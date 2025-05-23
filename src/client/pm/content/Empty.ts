@@ -27,17 +27,13 @@ export default class Empty implements PrimaryClass {
   }
   update(): void {}
   async destroy(): Promise<void> {
-    const useanim = true
-    if (useanim) {
-      this.el.classList.add("out")
-      await modal.waittime()
-    }
-    this.el.remove()
+    this.el.classList.add("out")
+    await modal.waittime()
     this.isLocked = false
-    userState.center = null
-    userState.last = null
+    this.el.remove()
   }
   run(): void {
+    userState.content = this
     this.createElement()
     culement.app().append(this.el)
   }

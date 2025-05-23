@@ -7,16 +7,10 @@ const modal = {
     const ms: number = ts - tsa || 0
     return new Promise((resolve) => setTimeout(resolve, ms))
   },
-  async loading(
-    newfunc: Promise<object | string | number | void>,
-    msg: string = "LOADING"
-  ): Promise<KiriminHttpResponse> {
+  async loading(newfunc: Promise<object | string | number | void>, msg: string = "LOADING"): Promise<KiriminHttpResponse> {
     const el = kelement("div", "loading", {
       e: kelement("div", "box", {
-        e: [
-          kelement("div", "spinner", { e: kelement("i", "fa-solid fa-circle-notch fa-spin") }),
-          kelement("div", "msg", { e: kelement("p", null, { e: msg }) })
-        ]
+        e: [kelement("div", "spinner", { e: kelement("i", "fa-solid fa-circle-notch fa-spin") }), kelement("div", "msg", { e: kelement("p", null, { e: msg }) })]
       })
     })
     document.querySelector(".app")?.append(el)

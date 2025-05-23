@@ -21,6 +21,7 @@ export interface UserDB {
   badges?: number[]
   bio?: string
   image?: string
+  isFriend?: number
 }
 export interface ChatDB {
   userid: string

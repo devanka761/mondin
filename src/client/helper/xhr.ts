@@ -2,7 +2,7 @@ import { KiriminHttpResponse } from "../types/helper.types"
 
 export default {
   request(method: string, url: string, s: object = {}, el?: boolean): Promise<KiriminHttpResponse> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const xhr: XMLHttpRequest = new XMLHttpRequest()
       xhr.open(method, url)
       xhr.responseType = "json"

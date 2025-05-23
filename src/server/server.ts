@@ -5,6 +5,9 @@ import session from "express-session"
 import SessionFileStore, { FileStore } from "session-file-store"
 import { ExpressPeerServer } from "peer"
 import authRouter from "./routes/auth.route"
+import accountRouter from "./routes/account.route"
+import profileRouter from "./routes/profile.route"
+import fileRouter from "./routes/file.route"
 import cfg from "./main/cfg"
 import { peerKey } from "./main/helper"
 import db from "./main/db"
@@ -39,6 +42,9 @@ app.set("view engine", "ejs")
 const PORT: number = cfg.APP_PORT as number
 
 app.use("/x/auth", authRouter)
+app.use("/x/account", accountRouter)
+app.use("/x/profile", profileRouter)
+app.use("/file", fileRouter)
 
 app.get("/app", (req: Request, res: Response) => {
   res.render("app")

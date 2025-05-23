@@ -15,9 +15,11 @@ export function cdUser(req: Request, res: Response, next: NextFunction) {
   next()
 }
 export function isUser(req: Request, res: Response, next: NextFunction) {
-  if (req.user?.id) {
-    if (db.ref.u[req.user.id]?.data) return next()
-    return res.json({ code: 401, msg: "UNAUTHORIZED" })
-  }
-  return res.json({ code: 401, msg: "UNAUTHORIZED" })
+  if (!req.user?.id || !db.ref.u[req.user.id].data) res.json({ code: 401, msg: "UNAUTHORIZED" })
+  next()
+  // if (req.user?.id) {
+  //   if (db.ref.u[req.user.id]?.data) return next()
+  //   res.json({ code: 401, msg: "UNAUTHORIZED" })
+  // }
+  // res.json({ code: 401, msg: "UNAUTHORIZED" })
 }

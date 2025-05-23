@@ -84,6 +84,7 @@ $bg: #3f464e;
     width: calc(100% - 40px);
     max-width: 500px;
     max-height: calc(100% - 40px);
+    scrollbar-width: thin;
     overflow-y: auto;
     scrollbar-width: thin;
     background-color: $bg;

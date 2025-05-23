@@ -32,7 +32,7 @@ function transpile_lastchat(s: ChatDB): string {
   }
 
   if (s.userid === myId) {
-    const isRead: boolean = (s.watch || []).filter((usrid) => usrid !== myId)?.length >= 1
+    const isRead: boolean = (s.watch || []).filter(usrid => usrid !== myId)?.length >= 1
     const readStatus = kelement("i", `fa-regular fa-check${isRead ? "-double" : ""}`)
     text = readStatus + text
   }
@@ -56,7 +56,7 @@ function chat_card(s: ChatCard): { [key: string]: HTMLDivElement } {
   img.src = user.image || "/assets/user.jpg"
   img.width = 50
   const edetail = kelement("div", "detail")
-  const eusername = kelement("div", "name", { e: `<div class="name"><p>Devanka</p></div>` })
+  const eusername = kelement("div", "name", { e: `<div class="name"><p>${user.username}</p></div>` })
   const elastchat = kelement("div", "last", { e: transpile_lastchat(lastchat) })
 
   const elastts = kelement("div", "last", { e: dateTime(s.lastchat.timestamp) })
@@ -94,10 +94,10 @@ export default class Chats implements PrimaryClass {
       if (cdba[cdba.length - 1].timestamp < cdbb[cdbb.length - 1].timestamp) return -1
       return 0
     })
-    cdb.forEach((ch) => {
+    cdb.forEach(ch => {
       const user = ch.u
       const inbox = Object.values(ch.c)
-      const unread = inbox.filter((ct) => {
+      const unread = inbox.filter(ct => {
         return ct.userid !== db.me.id && ct.type !== "deleted" && !ct.watch?.includes(<string>db.me.id)
       }).length
 
@@ -123,7 +123,7 @@ export default class Chats implements PrimaryClass {
     this.writeIfEmpty(cdb)
   }
   writeIfEmpty(cdb: ChatsDB[]): void {
-    const oldNomore: HTMLParagraphElement | null = document.querySelector(".nomore")
+    const oldNomore: HTMLParagraphElement | null = this.el.querySelector(".nomore")
     if (cdb.length < 1) {
       if (oldNomore) return
       const nomore = kelement("p", "nomore", { e: `${lang.CHTS_NOCHAT}<br/>${lang.CHTS_PLS}` })
@@ -133,18 +133,10 @@ export default class Chats implements PrimaryClass {
     }
   }
   async destroy(): Promise<void> {
-    const useanim = true
-    if (useanim) {
-      this.el.classList.add("out")
-      await modal.waittime()
-    }
-    this.el.remove()
+    this.el.classList.add("out")
+    await modal.waittime()
     this.isLocked = false
-    userState.center = null
-    userState.last = null
-    // const useanim = true
-    // if (useanim) return await this.sdestroy()
-    // else return this.fdestroy()
+    this.el.remove()
   }
   update(): void {}
   run(): void {

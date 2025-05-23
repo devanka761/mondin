@@ -26,6 +26,12 @@ class HeaderBar {
     this.el.append(this.apptitle, this.eactions)
     this.eactions.append(this.btn_find, this.btn_settings)
   }
+  btnListener(): void {
+    this.btn_find.onclick = async () => {
+      const navFind = <HTMLElement>document.querySelector(".nav-find")
+      if (navFind) navFind.click()
+    }
+  }
   set AppName(newtitle: string) {
     this.appname = newtitle
     this.apptitle.innerHTML = newtitle
@@ -36,6 +42,7 @@ class HeaderBar {
   run(): void {
     this.createElement()
     culement.app().append(this.el)
+    this.btnListener()
   }
 }
 export default new HeaderBar()
