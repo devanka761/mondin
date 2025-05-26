@@ -1,6 +1,9 @@
 import { Databases } from "../types/db.types"
 
-export const db: Databases = {
+const db: Databases = {
   c: {},
-  me: {}
+  me: {},
+  unread: {}
 }
+
+export default db

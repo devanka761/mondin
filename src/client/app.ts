@@ -1,4 +1,4 @@
-import "../../client/sass/app.scss"
+import "./sass/app.scss"
 
 import Init from "./main/init"
 

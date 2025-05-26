@@ -224,6 +224,7 @@ $bg: #3f464e;
     }
   }
 }
+
 .notip {
   z-index: 98;
   position: absolute;
@@ -248,7 +249,7 @@ $bg: #3f464e;
     border-right: 1px solid CurrentColor;
     padding-right: 10px;
     .icon {
-      font-size: 2.2em;
+      font-size: 2.2rem;
       img {
         width: 44px;
         height: 44px;
@@ -274,28 +275,29 @@ $bg: #3f464e;
     }
   }
   .close {
-    font-size: 2.2em;
+    font-size: 2.2rem;
+  }
+  &.g {
+    background-color: v.$sgreen;
+  }
+  &.y {
+    background-color: v.$black;
+    border: 1px solid v.$yellow;
+    color: v.$yellow;
+  }
+  &.r {
+    background-color: v.$cred;
+  }
+  &.rb {
+    background-color: v.$black;
+    color: v.$cred;
+    border: 1px solid v.$cred;
   }
   &.out {
     animation: slide_down_out 0.5s forwards;
   }
 }
-.notip.g {
-  background-color: v.$sgreen;
-}
-.notip.y {
-  background-color: v.$black;
-  border: 1px solid v.$yellow;
-  color: v.$yellow;
-}
-.notip.r {
-  background-color: v.$cred;
-}
-.notip.rb {
-  background-color: v.$black;
-  color: v.$cred;
-  border: 1px solid v.$cred;
-}
+
 .callnotip {
   z-index: 4;
   position: absolute;

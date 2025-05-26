@@ -1,7 +1,37 @@
 import fs from "fs"
-import { MeDB } from "../../client/types/db.types"
+import { MeDB, PeerDB } from "../../client/types/db.types"
 import db from "../main/db"
 import { AccountDB } from "../types/account.types"
+import { genhex, isProd, peerKey } from "../main/helper"
+import cfg from "../main/cfg"
+
+function initPeer(uid: string): PeerDB {
+  const peerid = genhex()
+  db.ref.u[uid].peer = peerid
+  const data: PeerDB = {
+    peerid,
+    peerConfig: {
+      host: <string>(isProd ? cfg.TURN_HOST : cfg.APP_HOST),
+      port: <number>cfg.APP_PORT,
+      key: peerKey,
+      path: "cloud"
+    }
+  }
+  if (isProd) {
+    delete data.peerConfig.port
+    data.peerConfig.config = {
+      iceServers: [
+        { urls: `stun:${cfg.TURN_HOST}:${cfg.TURN_PORT}` },
+        {
+          urls: `turn:${cfg.TURN_HOST}:${cfg.TURN_PORT}`,
+          username: <string>cfg.TURN_USERNAME,
+          credential: <string>cfg.TURN_PASSWORD
+        }
+      ]
+    }
+  }
+  return data
+}
 
 export function getMe(uid: string): { code: number; data?: AccountDB } {
   const udb = db.ref.u[uid]
@@ -14,12 +44,13 @@ export function getMe(uid: string): { code: number; data?: AccountDB } {
   meData.displayname = udb.dname
   meData.bio = udb.bio
   meData.badges = udb.b
-  meData.email = udb.data.map((usr) => {
+  meData.email = udb.data.map(usr => {
     return { email: <string>usr.email, provider: <string>usr.provider }
   })
 
   const data: AccountDB = {
-    me: meData
+    me: meData,
+    peer: initPeer(uid)
   }
   return { code: 200, data }
 }
@@ -34,7 +65,7 @@ export function setUsername(uid: string, s: { uname: string }) {
   const unamedeny = /^user/
   if (!s.uname.match(unamevalid)) return { code: 400, msg: "ACC_FAIL_UNAME_FORMAT" }
   if (s.uname.match(unamedeny)) return { code: 400, msg: "ACC_FAIL_CLAIMED" }
-  if (dvnkzName.find((usr) => usr === s.uname)) return { code: 400, msg: "ACC_FAIL_CLAIMED" }
+  if (dvnkzName.find(usr => usr === s.uname)) return { code: 400, msg: "ACC_FAIL_CLAIMED" }
   if (s.uname === udb.uname) return { code: 200, data: { text: s.uname } }
 
   db.ref.u[uid].uname = s.uname

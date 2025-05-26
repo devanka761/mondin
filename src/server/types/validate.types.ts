@@ -16,3 +16,10 @@ export type PayloadData = {
 // type TempData = {
 //   [key: string]: string | number | boolean | null | TempData;
 // };
+
+export interface Zender {
+  key: string
+  from: string
+  type: string
+  [key: string]: string | number | boolean
+}

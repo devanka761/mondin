@@ -10,6 +10,10 @@ const cfg: PossibleData = {
   APP_HOST: process.env.APP_HOST,
   SESSION_SECRET: process.env.SESSION_SECRET,
   CHAT_KEY: process.env.CHAT_KEY,
+  TURN_HOST: process.env.TURN_HOST,
+  TURN_PORT: process.env.TURN_PORT,
+  TURN_USERNAME: process.env.TURN_USERNAME,
+  TURN_PASSWORD: process.env.TURN_PASSWORD,
   SMTP_HOST: process.env.SMTP_HOST,
   SMTP_PORT: Number(process.env.SMTP_PORT),
   SMTP_USER: process.env.SMTP_USER,
@@ -22,7 +26,7 @@ const cfg: PossibleData = {
   GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET
 }
 const toOverRide: PossibleData = overRideData
-Object.keys(toOverRide).forEach((k) => {
+Object.keys(toOverRide).forEach(k => {
   cfg[k] = toOverRide[k]
 })
 export default cfg

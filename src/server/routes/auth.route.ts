@@ -48,18 +48,33 @@ router.get("/logout", (req: Request, res: Response) => {
 
 router.get("/:provider/callback", async (req: Request, res: Response) => {
   const { provider } = req.params
-  if (!hoauth.isProviderValid(provider)) res.json({ ok: false, code: 400 })
-  if (req.query?.error) res.json({ ok: false, code: 400 })
-  if (!req.query?.code) res.json({ ok: false, code: 400 })
+  if (!hoauth.isProviderValid(provider)) {
+    res.json({ ok: false, code: 400 })
+    return
+  }
+  if (req.query?.error) {
+    res.json({ ok: false, code: 400 })
+    return
+  }
+  if (!req.query?.code) {
+    res.json({ ok: false, code: 400 })
+    return
+  }
   const user = await hoauth.user({ provider, code: req.query.code as string })
-  if (!user || user.error) res.json({ ok: false, code: 400 })
+  if (!user || user.error) {
+    res.json({ ok: false, code: 400 })
+    return
+  }
   const verifyUser = rep(
     <RepBack>hauth.processThirdParty({
       user: user.data as PayloadData,
       provider: user.provider as string
     })
   )
-  if (!verifyUser.ok || verifyUser.code !== 200) res.json(verifyUser)
+  if (!verifyUser.ok || verifyUser.code !== 200) {
+    res.json(verifyUser)
+    return
+  }
   const payloadInfo = verifyUser.data as PayloadData
   const userInfo = payloadInfo.user as PayloadData
   const userData = userInfo.data as TempUserData
@@ -76,7 +91,10 @@ router.get("/:provider/callback", async (req: Request, res: Response) => {
 
 router.get("/:provider", cdUser, (req: Request, res: Response) => {
   const { provider } = req.params
-  if (!hoauth.isProviderValid(provider)) res.json({ ok: false, code: 400 })
+  if (!hoauth.isProviderValid(provider)) {
+    res.json({ ok: false, code: 400 })
+    return
+  }
   res.redirect(hoauth.auth(provider as "github" | "google" | "discord"))
 })
 

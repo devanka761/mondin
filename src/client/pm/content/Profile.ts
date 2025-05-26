@@ -3,15 +3,18 @@ import kelement from "../../helper/kelement"
 import { lang } from "../../helper/lang"
 import modal from "../../helper/modal"
 import setbadge from "../../helper/setbadge"
+import xhr from "../../helper/xhr"
 import userState from "../../main/userState"
 import { UserDB } from "../../types/db.types"
 import { PrimaryClass } from "../../types/userState.types"
+import { UserProfile } from "../../../server/types/profile.types"
+import db from "../../manager/db"
 
 export default class Profile implements PrimaryClass {
   readonly id: string
   public isLocked: boolean
   private el: HTMLDivElement
-  readonly user: UserDB
+  public user: UserDB
   constructor({ user }) {
     this.id = "profile"
     this.isLocked = false
@@ -82,30 +85,77 @@ export default class Profile implements PrimaryClass {
     if (this.user.isFriend === 2) return this.actSent(eoption)
     if (this.user.isFriend === 3) return this.actReceived(eoption)
   }
+  async actXhr(eoption: HTMLDivElement, ref: string, useconfirm?: string): Promise<{ ok: boolean; data?: { user: UserProfile } }> {
+    if (this.isLocked) return { ok: false }
+    this.isLocked = true
+
+    if (useconfirm) {
+      const isConfirm = await modal.confirm(lang[useconfirm].replace(/{user}/g, this.user.username))
+      if (!isConfirm) {
+        this.isLocked = false
+        return { ok: false }
+      }
+    }
+
+    eoption.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`
+    await modal.waittime(1000)
+    const setreq = await xhr.post(`/x/profile/${ref}`, { userid: this.user.id })
+    if (!setreq?.data?.user) {
+      this.renOptions()
+      await modal.alert(lang[setreq.msg] || lang.ERROR)
+      this.isLocked = false
+      return { ok: false }
+    }
+    const userData = (<unknown>setreq.data.user) as UserProfile
+    this.user = userData
+    const { isFriend } = userData
+
+    const currKey = Object.keys(db.c).find(k => {
+      return db.c[k].u.id === this.user.id
+    })
+    if (currKey) {
+      db.c[currKey].u.isFriend = isFriend
+      if (isFriend === 1 && db.me.req) {
+        db.me.req = db.me.req.filter(usr => usr.id !== userData.id)
+        if (db.unread.c) delete db.unread.c[currKey]
+      } else if (isFriend === 2) {
+        db.me.req = (db.me.req || []).filter(usr => usr.id !== userData.id)
+      } else if (isFriend === 3) {
+        if (!db.me.req) db.me.req = []
+        db.me.req.push(userData)
+      } else if (db.me.req) {
+        db.me.req = db.me.req.filter(usr => usr.id !== userData.id)
+      }
+    }
+
+    this.isLocked = false
+    this.renOptions()
+    return { ok: true, data: { user: userData } }
+  }
   actNotFriend(eoption: HTMLDivElement): void {
     const btn = kelement("div", "btn sb", { e: `<i class="fa-solid fa-user-plus"></i> ${lang.PROF_ADD}` })
     eoption.append(btn)
-    btn.onclick = async () => {}
+    btn.onclick = async () => this.actXhr(btn, "addfriend")
   }
   actFriend(eoption: HTMLDivElement): void {
     const btn = kelement("div", "btn sr", { e: `<i class="fa-solid fa-user-minus"></i> ${lang.PROF_UNFRIEND}` })
     btn.classList.add("btn", "sr")
     eoption.append(btn)
-    btn.onclick = async () => {}
+    btn.onclick = async () => this.actXhr(btn, "unfriend", "PROF_CONF_UNFRIEND")
   }
   actSent(eoption: HTMLDivElement): void {
     eoption.innerHTML = `<div class="note sy">${lang.PROF_WAIT}</div>`
     const btn = kelement("div", "btn sr", { e: `<i class="fa-solid fa-user-xmark"></i> ${lang.PROF_CANCEL}` })
     eoption.append(btn)
-    btn.onclick = async () => {}
+    btn.onclick = async () => this.actXhr(btn, "cancelfriend", "PROF_CONF_CANCEL")
   }
   actReceived(eoption: HTMLDivElement): void {
     const btn_a = kelement("div", "btn sg", { e: `<i class="fa-solid fa-user-check"></i> ${lang.PROF_ACCEPT}` })
     const btn_b = kelement("div", "btn sr", { e: `<i class="fa-solid fa-user-xmark"></i> ${lang.PROF_IGNORE}` })
 
     eoption.append(btn_a, btn_b)
-    btn_a.onclick = async () => {}
-    btn_b.onclick = async () => {}
+    btn_a.onclick = async () => this.actXhr(btn_a, "acceptfriend")
+    btn_b.onclick = async () => this.actXhr(btn_b, "ignorefriend", "PROF_CONF_IGNORE")
   }
   update(): void | Promise<void> {}
   async destroy(): Promise<void> {

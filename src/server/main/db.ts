@@ -35,6 +35,7 @@ class DevankaLocal {
           })
         }
         console.info(`Data - ${fileKey} - Loaded!`)
+        this.save(file)
       })
   }
   fileGet(filekey: string, filefolder: string) {

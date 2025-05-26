@@ -10,7 +10,8 @@ import { AccountDB } from "../../server/types/account.types"
 import headerBar from "../pm/header/HeaderBar"
 import Nav from "../pm/header/Nav"
 import { KiriminHttpResponse, LangObject, Languages } from "../types/helper.types"
-import { db } from "../manager/db"
+import db from "../manager/db"
+import cloud from "../manager/cloud"
 
 let lang: LangObject = {}
 
@@ -76,6 +77,7 @@ export default class Auth {
     new Account().run()
   }
   initializeData(s: AccountDB): void {
+    if (s.peer) cloud.run(s.peer)
     if (s.me) db.me = s.me
     // const clientData = new ClientData({ id: k });
     // clientData.init(cloud_hb.s[k]);

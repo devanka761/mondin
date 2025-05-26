@@ -6,7 +6,7 @@ import sdate from "../../helper/sdate"
 import setbadge from "../../helper/setbadge"
 import xhr from "../../helper/xhr"
 import userState from "../../main/userState"
-import { db } from "../../manager/db"
+import db from "../../manager/db"
 import { PrimaryClass } from "../../types/userState.types"
 
 export default class Account implements PrimaryClass {

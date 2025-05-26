@@ -6,13 +6,11 @@ export const peerKey: string = crypto.randomBytes(16).toString("hex")
 
 export const isProd: boolean = cfg.APP_PRODUCTION?.toString() === "true"
 
-export function genPeer(): string {
+export function genhex(): string {
   return crypto.randomBytes(8).toString("hex") + Date.now().toString(36)
 }
 
-export function rep(
-  options: { ok?: boolean; code: number; data?: object | null; msg?: string } = { ok: false, code: 400, data: null }
-): PayloadData {
+export function rep(options: { ok?: boolean; code: number; data?: object | null; msg?: string } = { ok: false, code: 400, data: null }): PayloadData {
   const repdata: PayloadData = Object.assign(
     {},
     {

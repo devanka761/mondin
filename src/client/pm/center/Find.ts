@@ -3,6 +3,7 @@ import { escapeHTML, ss } from "../../helper/escaper"
 import kelement from "../../helper/kelement"
 import { lang } from "../../helper/lang"
 import modal from "../../helper/modal"
+import notip from "../../helper/notip"
 import setbadge from "../../helper/setbadge"
 import xhr from "../../helper/xhr"
 import userState from "../../main/userState"
@@ -121,7 +122,20 @@ export default class Find implements PrimaryClass {
           new Profile({ user: usr }).run()
         }
       })
+      if (userResult.length === 1) {
+        const usr = userResult[0]
+        if (userState.currcenter?.isLocked) return
+        if (userState.currcontent?.isLocked) return
+        if (userState.currcontent?.id === "profile") {
+          if ((userState.currcontent as Profile)?.user?.id === usr.id) return
+        }
+        userState.currcontent?.destroy()
+        new Profile({ user: usr }).run()
+      }
       this.isLocked = false
+    }
+    btnRandom.onclick = () => {
+      notip({ a: "Judul", b: "Keterangan", c: 0 })
     }
   }
   update(): void | Promise<void> {}

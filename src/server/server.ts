@@ -65,7 +65,12 @@ const server = ExpressPeerServer(appService, {
 })
 
 server.on("error", console.error)
-
+// server.on("message", (c, _msg) => {
+//   console.log(c.getId(), msg)
+// })
+server.on("connection", c => {
+  console.log("connected", c.getId())
+})
 app.use("/cloud", server)
 
 app.use("/", (req: Request, res: Response) => {

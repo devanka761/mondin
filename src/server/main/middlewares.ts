@@ -7,7 +7,10 @@ export function cdUser(req: Request, res: Response, next: NextFunction) {
   const uid = req.user?.id || "unknown"
 
   if (userCDs.has(uid)) {
-    if (Date.now() <= userCDs.get(uid)) res.json({ ok: false, code: 429, msg: "TO_MANY_REQUEST" })
+    if (Date.now() <= userCDs.get(uid)) {
+      res.json({ ok: false, code: 429, msg: "TO_MANY_REQUEST" })
+      return
+    }
   }
 
   userCDs.set(uid, Date.now() + 1000)
@@ -15,7 +18,10 @@ export function cdUser(req: Request, res: Response, next: NextFunction) {
   next()
 }
 export function isUser(req: Request, res: Response, next: NextFunction) {
-  if (!req.user?.id || !db.ref.u[req.user.id].data) res.json({ code: 401, msg: "UNAUTHORIZED" })
+  if (!req.user?.id || !db.ref.u[req.user.id].data) {
+    res.json({ code: 401, msg: "UNAUTHORIZED" })
+    return
+  }
   next()
   // if (req.user?.id) {
   //   if (db.ref.u[req.user.id]?.data) return next()

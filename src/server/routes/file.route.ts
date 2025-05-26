@@ -9,7 +9,7 @@ router.use(isUser)
 
 router.get("/user/:imgsrc", (req: Request, res: Response) => {
   const { imgsrc } = req.params
-  const file = hfile.user(imgsrc)
+  const file = hfile.userFile(imgsrc)
   if (file) return res.sendFile(file, { root: "./" })
   res.sendStatus(404)
 })
