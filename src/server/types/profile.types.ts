@@ -7,3 +7,9 @@ export interface UserProfile {
   badges?: number[]
   isFriend?: number
 }
+
+export interface GroupProfile extends UserProfile {
+  link?: string
+  owner?: string
+  type?: "private" | "public" | "global"
+}

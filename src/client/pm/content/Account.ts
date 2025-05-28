@@ -256,11 +256,7 @@ export default class Account implements PrimaryClass {
   renUname(): void {
     const euname = <HTMLParagraphElement>this.el.querySelector(".username .outer .chp-f p")
     euname.innerHTML = <string>db.me.username
-    if (db.me.badges && db.me.badges.length >= 1) {
-      for (const badge of db.me.badges.sort((a, b) => b - a)) {
-        euname.innerHTML += " " + setbadge(badge)
-      }
-    }
+    if (db.me.badges) setbadge(euname, db.me.badges)
   }
   renDname(): void {
     const edname = <HTMLParagraphElement>this.el.querySelector(".userdisplayname .outer .chp-f p")

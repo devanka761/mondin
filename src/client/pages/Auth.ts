@@ -18,9 +18,9 @@ let lang: LangObject = {}
 type LoginProvider = "USE_DISCORD_OAUTH" | "USE_GITHUB_OAUTH" | "USE_GOOGLE_OAUTH"
 
 const ProviderObject = {
-  USE_OAUTH_DISCORD: <string>"discord",
-  USE_OAUTH_GITHUB: <string>"github",
-  USE_OAUTH_GOOGLE: <string>"google"
+  USE_OAUTH_DISCORD: "discord",
+  USE_OAUTH_GITHUB: "github",
+  USE_OAUTH_GOOGLE: "google"
 }
 
 function loginProvider(provider: LoginProvider): HTMLElement {

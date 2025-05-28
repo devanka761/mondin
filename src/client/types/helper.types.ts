@@ -1,3 +1,4 @@
+import LangID from "../../../client/locales/id.json"
 type PossibleData = {
   [key: string]: string | number | PossibleData | string[] | number[] | PossibleData[]
 }
@@ -13,9 +14,8 @@ export type Languages = "id" | "en"
 export interface LocalesLang {
   lang: string
 }
-export interface LangObject {
-  [key: string]: string
-}
+export type LangObject = typeof LangID | { [key: string]: string }
+
 interface ModalObject {
   ic: string
   msg: string

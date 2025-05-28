@@ -1,21 +1,15 @@
 import userState from "../../main/userState"
+import swiper from "../../manager/swiper"
 import Chats from "../center/Chats"
 import Find from "../center/Find"
 
-async function excortCenter(): Promise<void> {
-  if (userState.currcenter?.isLocked) return
-  if (userState.currcenter) {
-    await userState.currcenter.destroy()
-  }
-}
 export default [
   {
     id: "find",
     txt: "APP_SEARCH",
     c: "fa-solid fa-magnifying-glass",
     run: async () => {
-      excortCenter()
-      new Find().run()
+      swiper(new Find(), userState.currcenter)
     }
   },
   {
@@ -23,8 +17,7 @@ export default [
     txt: "APP_CHATS",
     c: "fa-solid fa-comments",
     run: async () => {
-      excortCenter()
-      new Chats().run()
+      swiper(new Chats(), userState.currcenter)
     }
   }
 ]

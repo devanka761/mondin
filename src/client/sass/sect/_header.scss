@@ -3,7 +3,8 @@
 .header {
   z-index: 27;
   position: absolute;
-  top: 0;left: 100px;
+  top: 0;
+  left: 100px;
   width: 350px;
   height: 50px;
   background-color: v.$card_secondary;
@@ -14,7 +15,7 @@
   .title {
     padding: 10px;
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.5em;
     text-transform: uppercase;
   }
   .actions {
@@ -24,12 +25,13 @@
     align-items: center;
     gap: 10px;
     .btn {
-      font-size: 1.25rem;
+      font-size: 1.25em;
     }
   }
   .appname-options {
     position: absolute;
-    top: 50px; right: 0;
+    top: 50px;
+    right: 0;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
     box-shadow: 0 0 10px v.$black;

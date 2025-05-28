@@ -9,16 +9,20 @@ import { UserDB } from "../../types/db.types"
 import { PrimaryClass } from "../../types/userState.types"
 import { UserProfile } from "../../../server/types/profile.types"
 import db from "../../manager/db"
+import swiper from "../../manager/swiper"
+import Room from "./Room"
 
 export default class Profile implements PrimaryClass {
   readonly id: string
   public isLocked: boolean
   private el: HTMLDivElement
   public user: UserDB
-  constructor({ user }) {
+  private classBefore?: PrimaryClass
+  constructor({ user, classBefore }) {
     this.id = "profile"
     this.isLocked = false
     this.user = user
+    this.classBefore = classBefore
   }
   createElement(): void {
     this.el = kelement("div", "Profile pmcontent")
@@ -60,11 +64,7 @@ export default class Profile implements PrimaryClass {
   renUname(): void {
     const euname = <HTMLParagraphElement>this.el.querySelector(".wall .username p")
     euname.innerHTML = this.user.username
-    if (this.user.badges && this.user.badges.length >= 1) {
-      for (const badge of this.user.badges.sort((a, b) => b - a)) {
-        euname.innerHTML += " " + setbadge(badge)
-      }
-    }
+    if (this.user.badges) setbadge(euname, this.user.badges)
   }
   renDname(): void {
     const edname = <HTMLParagraphElement>this.el.querySelector(".wall .displayname p")
@@ -73,6 +73,11 @@ export default class Profile implements PrimaryClass {
   renBio(): void {
     const ebio = <HTMLParagraphElement>this.el.querySelector(".wall .bio p")
     ebio.innerText = this.user.bio || lang.ACC_NOBIO
+  }
+  btnListener(): void {
+    // btn-chat
+    const btnChat = <HTMLDivElement>this.el.querySelector(".btn-chat")
+    btnChat.onclick = () => swiper(new Room({ user: this.user }), userState.currcontent)
   }
   clearOptions(eoptions: HTMLDivElement): void {
     while (eoptions.lastChild) eoptions.lastChild.remove()
@@ -158,11 +163,12 @@ export default class Profile implements PrimaryClass {
     btn_b.onclick = async () => this.actXhr(btn_b, "ignorefriend", "PROF_CONF_IGNORE")
   }
   update(): void | Promise<void> {}
-  async destroy(): Promise<void> {
+  async destroy(newer?: PrimaryClass): Promise<void> {
     this.el.classList.add("out")
     await modal.waittime()
     this.isLocked = false
     this.el.remove()
+    if (newer) newer.run()
   }
   run(): void {
     userState.content = this
@@ -170,5 +176,6 @@ export default class Profile implements PrimaryClass {
     culement.app().append(this.el)
     this.writeDetail()
     this.renOptions()
+    this.btnListener()
   }
 }

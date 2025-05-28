@@ -6,7 +6,8 @@ $topheight: 60px;
   background-color: v.$bg;
   .top {
     position: absolute;
-    top: 0;left: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     background-color: v.$bar_bg;
     color: v.$white;
@@ -14,7 +15,7 @@ $topheight: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.25rem;
+    font-size: 1.25em;
     .btn {
       position: absolute;
       left: 10px;
@@ -41,7 +42,8 @@ $topheight: 60px;
   }
   .wall {
     position: absolute;
-    top: $topheight;left: 0;
+    top: $topheight;
+    left: 0;
     width: 100%;
     height: calc(100% - $topheight);
     padding: 20px;
@@ -60,7 +62,7 @@ $topheight: 60px;
         .chp-t {
           text-align: center;
           padding: 5px;
-          font-size: 0.9rem;
+          font-size: 0.9em;
           font-style: italic;
           background-color: v.$card_primary;
         }
@@ -86,7 +88,7 @@ $topheight: 60px;
         .chp-e {
           text-align: center;
           padding: 5px;
-          font-size: 0.9rem;
+          font-size: 0.9em;
           background-color: v.$sgray;
           font-weight: bold;
           cursor: pointer;
@@ -94,7 +96,7 @@ $topheight: 60px;
         .chp-n {
           color: v.$yellow;
           font-style: italic;
-          font-size: 0.9rem;
+          font-size: 0.9em;
           text-align: center;
           padding: 0 5px;
           margin-bottom: 5px;
@@ -120,12 +122,13 @@ $topheight: 60px;
         }
         .btn {
           position: absolute;
-          bottom: 0;left: 0;
+          bottom: 0;
+          left: 0;
           width: 100%;
           margin: 0 auto;
           text-align: center;
           padding: 5px;
-          font-size: 1.2rem;
+          font-size: 1.2em;
           background-color: #00000080;
         }
       }
@@ -179,7 +182,7 @@ $topheight: 60px;
               }
               .uname {
                 i.fa-user-crown {
-                  font-size: 0.8rem;
+                  font-size: 0.8em;
                   color: v.$yellow;
                   margin-left: 5px;
                 }

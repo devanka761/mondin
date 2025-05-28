@@ -8,6 +8,7 @@ import setbadge from "../../helper/setbadge"
 import xhr from "../../helper/xhr"
 import userState from "../../main/userState"
 import resetform from "../../manager/resetform"
+import swiper from "../../manager/swiper"
 import { UserDB } from "../../types/db.types"
 import { PrimaryClass } from "../../types/userState.types"
 import Profile from "../content/Profile"
@@ -26,11 +27,7 @@ function user_card(s: UserDB): { [key: string]: HTMLDivElement } {
   const edetail = kelement("div", "detail")
   const eusername = kelement("div", "name", { e: `${username}` })
   const elastchat = kelement("div", "last", { e: escapeHTML(ss(displayname, 30)) })
-  if (badges && badges.length >= 1) {
-    for (const badge of badges.sort((a, b) => b - a)) {
-      eusername.innerHTML += " " + setbadge(badge)
-    }
-  }
+  if (badges) setbadge(eusername, badges)
 
   card.append(eleft /*eright*/)
   eleft.append(ecimg, edetail)
@@ -113,24 +110,20 @@ export default class Find implements PrimaryClass {
         const { card } = user_card(usr)
         cardlist.append(card)
         card.onclick = async () => {
-          if (userState.currcenter?.isLocked) return
           if (userState.currcontent?.isLocked) return
           if (userState.currcontent?.id === "profile") {
             if ((userState.currcontent as Profile)?.user?.id === usr.id) return
           }
-          userState.currcontent?.destroy()
-          new Profile({ user: usr }).run()
+          swiper(new Profile({ user: usr }), userState.currcontent)
         }
       })
       if (userResult.length === 1) {
         const usr = userResult[0]
-        if (userState.currcenter?.isLocked) return
         if (userState.currcontent?.isLocked) return
         if (userState.currcontent?.id === "profile") {
           if ((userState.currcontent as Profile)?.user?.id === usr.id) return
         }
-        userState.currcontent?.destroy()
-        new Profile({ user: usr }).run()
+        swiper(new Profile({ user: usr }), userState.currcontent)
       }
       this.isLocked = false
     }

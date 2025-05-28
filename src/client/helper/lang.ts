@@ -1,5 +1,4 @@
 import { LangObject, Languages, LocalesLang } from "../types/helper.types"
-
 import xhr from "./xhr"
 
 export const lang: LangObject = {}
@@ -23,7 +22,7 @@ class KiriminLangs {
     const file = this.read()
     this.currLang = file && file.lang === "en" ? "en" : "id"
     const newLang = await xhr.get(`/locales/${this.currLang}.json`)
-    Object.keys(newLang).forEach((k) => (lang[k] = newLang[k]))
+    Object.keys(newLang).forEach(k => (lang[k] = newLang[k]))
   }
 }
 
