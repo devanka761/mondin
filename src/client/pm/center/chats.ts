@@ -32,7 +32,7 @@ function transpile_lastchat(s: ChatDB): string {
   }
 
   if (s.userid === myId) {
-    const isRead: boolean = (s.watch || []).filter(usrid => usrid !== myId)?.length >= 1
+    const isRead: boolean = (s.watch || []).filter((usrid) => usrid !== myId)?.length >= 1
     const readStatus = kelement("i", `fa-regular fa-check${isRead ? "-double" : ""}`)
     text = readStatus + text
   }
@@ -80,13 +80,13 @@ export default class Chats implements PrimaryClass {
     this.id = "chats"
     this.isLocked = false
   }
-  createElement(): void {
+  private createElement(): void {
     this.el = kelement("div", "Chats pmcenter")
     this.card_list = kelement("div", "card-list")
     this.el.append(this.card_list)
   }
-  btnListener(): void {}
-  writeChatList(): void {
+  private btnListener(): void {}
+  private writeChatList(): void {
     const cdb: ChatsDB[] = Object.values(db.c || {}).sort((a, b) => {
       const cdba = Object.values(a.c)
       const cdbb = Object.values(b.c)
@@ -94,10 +94,10 @@ export default class Chats implements PrimaryClass {
       if (cdba[cdba.length - 1].timestamp < cdbb[cdbb.length - 1].timestamp) return -1
       return 0
     })
-    cdb.forEach(ch => {
+    cdb.forEach((ch) => {
       const user = ch.u
       const inbox = Object.values(ch.c)
-      const unread = inbox.filter(ct => {
+      const unread = inbox.filter((ct) => {
         return ct.userid !== db.me.id && ct.type !== "deleted" && !ct.watch?.includes(<string>db.me.id)
       }).length
 
@@ -122,7 +122,7 @@ export default class Chats implements PrimaryClass {
 
     this.writeIfEmpty(cdb)
   }
-  writeIfEmpty(cdb: ChatsDB[]): void {
+  private writeIfEmpty(cdb: ChatsDB[]): void {
     const oldNomore: HTMLParagraphElement | null = this.el.querySelector(".nomore")
     if (cdb.length < 1) {
       if (oldNomore) return

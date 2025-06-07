@@ -2,6 +2,7 @@ import culement from "../../helper/culement"
 import kelement from "../../helper/kelement"
 import modal from "../../helper/modal"
 import setbadge from "../../helper/setbadge"
+import MessageWriter from "../../main/MessageWriter"
 import userState from "../../main/userState"
 import swiper from "../../manager/swiper"
 import { UserDB } from "../../types/db.types"
@@ -23,7 +24,7 @@ export default class Room implements PrimaryClass {
     this.user = user
     this.form = new RoomForm({ room: this })
   }
-  createElement(): void {
+  private createElement(): void {
     this.el = kelement("div", "Room pmcontent")
     this.el.innerHTML = `
     <div class="top">
@@ -54,11 +55,11 @@ export default class Room implements PrimaryClass {
     this.middle = <HTMLDivElement>this.el.querySelector(".mid")
     this.bottom = <HTMLDivElement>this.el.querySelector(".bottom")
   }
-  writeData(): void {
+  private writeData(): void {
     this.writeUser()
     this.writeForm()
   }
-  writeUser(): void {
+  private writeUser(): void {
     const img = new Image()
     img.onerror = () => (img.src = "/assets/user.jpg")
     img.alt = this.user.username
@@ -77,7 +78,7 @@ export default class Room implements PrimaryClass {
       swiper(new Profile({ user: this.user, classBefore: this }), userState.currcontent)
     }
   }
-  writeForm(): void {
+  private writeForm(): void {
     this.form.run(this.bottom)
   }
   resizeMiddle(formHeight: number): void {
@@ -90,6 +91,9 @@ export default class Room implements PrimaryClass {
     await modal.waittime()
     this.isLocked = false
     this.el.remove()
+  }
+  sendMessage(messageWriten: MessageWriter): void {
+    console.log(messageWriten)
   }
   run(): void {
     userState.content = this

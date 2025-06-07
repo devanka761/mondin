@@ -45,10 +45,10 @@ export default class Find implements PrimaryClass {
     this.id = "find"
     this.isLocked = false
   }
-  createElement() {
+  private createElement() {
     this.el = kelement("div", "Chats pmcenter")
   }
-  renderBtn(): void {
+  private renderBtn(): void {
     const searchBar1 = kelement("div", "search", { e: `<p>${lang.FIND_RANDOM}</p>` })
     const btnRandom = kelement("div", "btn btn-random", { e: `<i class="fa-solid fa-play"></i> ${lang.FIND_START}` })
     searchBar1.append(btnRandom)
@@ -70,8 +70,8 @@ export default class Find implements PrimaryClass {
       }, 100)
     }
   }
-  formListener(btnRandom: HTMLDivElement, form: HTMLFormElement, cardlist: HTMLDivElement): void {
-    form.onsubmit = async e => {
+  private formListener(btnRandom: HTMLDivElement, form: HTMLFormElement, cardlist: HTMLDivElement): void {
+    form.onsubmit = async (e) => {
       e.preventDefault()
       if (this.isLocked) return
       this.isLocked = true
@@ -106,7 +106,7 @@ export default class Find implements PrimaryClass {
         cardlist.lastChild.remove()
       }
       this.isLocked = false
-      userResult.forEach(usr => {
+      userResult.forEach((usr) => {
         const { card } = user_card(usr)
         cardlist.append(card)
         card.onclick = async () => {

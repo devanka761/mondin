@@ -54,11 +54,11 @@ let auth_container: HTMLDivElement | null = null
 
 export default class Auth {
   private el: HTMLDivElement
-  crateElement(): void {
+  private crateElement(): void {
     this.el = kelement("div", "Auth")
     this.el.innerHTML = `<div class="none"><i class="fa-solid fa-map"></i> <i class="fa-regular fa-map"></i> <i class="fa-light fa-map"></i> <i class="fa-thin fa-map"></i> <i class="fa-duotone fa-solid fa-map"></i> <i class="fa-duotone fa-regular fa-map"></i> <i class="fa-duotone fa-light fa-map"></i> <i class="fa-duotone fa-thin fa-map"></i> <i class="fa-sharp fa-solid fa-map"></i> <i class="fa-brands fa-font-awesome"></i> <i class="fa-sharp fa-regular fa-map"></i> <i class="fa-sharp fa-light fa-map"></i> <i class="fa-sharp fa-thin fa-map"></i> <i class="fa-sharp-duotone fa-solid fa-map"></i> <i class="fa-sharp-duotone fa-regular fa-map"></i> <i class="fa-sharp-duotone fa-light fa-map"></i> <i class="fa-sharp-duotone fa-thin fa-map"></i></div>`
   }
-  async checkUser(): Promise<void> {
+  private async checkUser(): Promise<void> {
     await klang.klang.load()
     lang = klang.lang
 
@@ -76,13 +76,13 @@ export default class Auth {
     // new Empty().run()
     new Account().run()
   }
-  initializeData(s: AccountDB): void {
+  private initializeData(s: AccountDB): void {
     if (s.peer) cloud.run(s.peer)
     if (s.me) db.me = s.me
     // const clientData = new ClientData({ id: k });
     // clientData.init(cloud_hb.s[k]);
   }
-  writeForm(): void {
+  private writeForm(): void {
     auth_container = this.el
     new SignEmail().run()
   }
@@ -101,7 +101,7 @@ class SignEmail {
     this.email = email
     this.isLocked = false
   }
-  createElement(): void {
+  private createElement(): void {
     this.el = kelement("div", "box")
     this.el.innerHTML = `
     <div class="top">
@@ -136,11 +136,11 @@ class SignEmail {
       </div>
     </form>`
   }
-  formListener(): void {
+  private formListener(): void {
     const eProviders: HTMLElement = this.el.querySelector(".other-providers") as HTMLElement
     Object.keys(config)
-      .filter(k => k.includes("USE_OAUTH") && config[k] === true)
-      .forEach(k => {
+      .filter((k) => k.includes("USE_OAUTH") && config[k] === true)
+      .forEach((k) => {
         eProviders.append(loginProvider(k as LoginProvider))
       })
 
@@ -165,7 +165,7 @@ class SignEmail {
       await this.destroy()
       new SignEmail({ email: this.email }).run()
     }
-    form.onsubmit = async e => {
+    form.onsubmit = async (e) => {
       e.preventDefault()
       if (this.isLocked) return
       this.isLocked = true
@@ -204,7 +204,7 @@ class SignCode {
     this.email = config.email
     this.isLocked = false
   }
-  createElement(): void {
+  private createElement(): void {
     this.el = kelement("div", "box")
     this.el.innerHTML = `
     <div class="top">
@@ -245,7 +245,7 @@ class SignCode {
       </div>
     </form>`
   }
-  formListener(): void {
+  private formListener(): void {
     const btnLang: HTMLElement = this.el.querySelector(".btn-lang") as HTMLElement
     btnLang.onclick = async () => {
       if (this.isLocked) return
@@ -278,7 +278,7 @@ class SignCode {
       new SignEmail({ email: this.email }).run()
     }
     const form: HTMLFormElement = this.el.querySelector("#verify-form") as HTMLFormElement
-    form.onsubmit = async e => {
+    form.onsubmit = async (e) => {
       e.preventDefault()
       if (this.isLocked) return
       this.isLocked = true

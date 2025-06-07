@@ -14,11 +14,11 @@ export default class Nav implements PrimaryClass {
     this.id = "nav"
     this.isLocked = false
   }
-  createElement(): void {
+  private createElement(): void {
     this.el = kelement("div", "nav")
   }
-  writeNav(): void {
-    _navlist.forEach(btn => {
+  private writeNav(): void {
+    _navlist.forEach((btn) => {
       const elnav = kelement("div", `btn nav-${btn.id}`)
 
       const centerClass = <PrimaryClass>userState.currcenter
@@ -37,7 +37,7 @@ export default class Nav implements PrimaryClass {
         if (userState.currcontent?.isLocked) return
         this.isLocked = true
         await btn.run()
-        this.el.querySelectorAll(".selected").forEach(elod => elod.classList.remove("selected"))
+        this.el.querySelectorAll(".selected").forEach((elod) => elod.classList.remove("selected"))
         elnav.classList.add("selected")
         HeaderBar.AppName = lang[btn.txt]
         this.isLocked = false

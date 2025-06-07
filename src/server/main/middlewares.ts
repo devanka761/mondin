@@ -6,15 +6,13 @@ const userCDs = new Map()
 export function cdUser(req: Request, res: Response, next: NextFunction) {
   const uid = req.user?.id || "unknown"
 
-  if (userCDs.has(uid)) {
-    if (Date.now() <= userCDs.get(uid)) {
-      res.json({ ok: false, code: 429, msg: "TO_MANY_REQUEST" })
-      return
-    }
+  if (userCDs.has(uid) && userCDs.get(uid) > Date.now()) {
+    res.json({ ok: false, code: 429, msg: "TO_MANY_REQUEST" })
+    return
   }
 
+  if (userCDs.has(uid)) userCDs.delete(uid)
   userCDs.set(uid, Date.now() + 1000)
-  setTimeout(() => userCDs.delete(uid), 1000)
   next()
 }
 export function isUser(req: Request, res: Response, next: NextFunction) {

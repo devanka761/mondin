@@ -7,15 +7,16 @@ import { ExpressPeerServer } from "peer"
 import authRouter from "./routes/auth.route"
 import accountRouter from "./routes/account.route"
 import profileRouter from "./routes/profile.route"
+import roomRouter from "./routes/room.route"
 import fileRouter from "./routes/file.route"
 import cfg from "./main/cfg"
 import { peerKey } from "./main/helper"
 import db from "./main/db"
 import { sessionUserBinder } from "./main/binder"
 
-if (!fs.existsSync("./server")) fs.mkdirSync("./server")
-if (!fs.existsSync("./server/sessions")) {
-  fs.mkdirSync("./server/sessions")
+if (!fs.existsSync("./dist")) fs.mkdirSync("./dist")
+if (!fs.existsSync("./dist/sessions")) {
+  fs.mkdirSync("./dist/sessions")
   console.log("Sessions Reloaded!")
 }
 db.load()
@@ -30,13 +31,13 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 30, sameSite: "strict" },
-    store: new SessionFileStorage({ path: "./server/sessions", logFn() {} })
+    store: new SessionFileStorage({ path: "./dist/sessions", logFn() {} })
   })
 )
 
 app.use(sessionUserBinder)
 
-app.use(express.static("client"))
+app.use(express.static("public"))
 app.set("view engine", "ejs")
 
 const PORT: number = cfg.APP_PORT as number
@@ -44,6 +45,7 @@ const PORT: number = cfg.APP_PORT as number
 app.use("/x/auth", authRouter)
 app.use("/x/account", accountRouter)
 app.use("/x/profile", profileRouter)
+app.use("/x/room", roomRouter)
 app.use("/file", fileRouter)
 
 app.get("/app", (req: Request, res: Response) => {
@@ -68,7 +70,7 @@ server.on("error", console.error)
 // server.on("message", (c, _msg) => {
 //   console.log(c.getId(), msg)
 // })
-server.on("connection", c => {
+server.on("connection", (c) => {
   console.log("connected", c.getId())
 })
 app.use("/cloud", server)

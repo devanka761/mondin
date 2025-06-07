@@ -8,13 +8,13 @@
       "*": ["./node_modules/*"]
     },
     "typeRoots": [
-      "./src/server/types",
-      "./src/client/types",
+      "./src/server/types/",
+      "./src/client/types/",
       "./node_modules/@types"
     ],
     "resolveJsonModule": true,
     "sourceMap": true,
-    "outDir": "./server/bundle",
+    "outDir": "./dist/bundle",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -22,5 +22,5 @@
     "skipLibCheck": true
   },
   "include": ["./src/server/**/*"],
-  "exclude": ["./node_modules/*"]
+  "exclude": ["./node_modules/*", "./dist/**/*", "./public/**/*"]
 }

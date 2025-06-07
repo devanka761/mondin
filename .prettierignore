@@ -7,8 +7,6 @@ package-lock.json
 tsconfig.json
 README.md
 nodemon.json
-client
-!src/client
-server
-!src/server
+public
+dist
 ex

@@ -6,7 +6,7 @@ module.exports = {
   target: "node",
   entry: "./src/server/server.ts",
   output: {
-    path: path.resolve(__dirname, "server/bundle"),
+    path: path.resolve(__dirname, "dist/bundle"),
     filename: "bundle.js"
   },
   externals: [nodeExternals()],

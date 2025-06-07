@@ -19,7 +19,7 @@ export default class Account implements PrimaryClass {
     this.isLocked = false
     this.x = {}
   }
-  createElement() {
+  private createElement() {
     this.el = kelement("div", "Account pmcontent")
     this.el.innerHTML = `
     <div class="top">
@@ -71,16 +71,16 @@ export default class Account implements PrimaryClass {
       </div>
     </div>`
   }
-  writeDetail(): void {
+  private writeDetail(): void {
     this.renImage()
     this.renUname()
     this.renDname()
     this.renBio()
     this.renEmails()
   }
-  btnListener(): void {
+  private btnListener(): void {
     const elogout = <HTMLAnchorElement>this.el.querySelector(".usersign a.logout")
-    elogout.onclick = async e => {
+    elogout.onclick = async (e) => {
       e.preventDefault()
       if (this.isLocked) return
       this.isLocked = true
@@ -218,7 +218,7 @@ export default class Account implements PrimaryClass {
           this.isLocked = false
           return
         }
-        const imgsrc = await new Promise(resolve => {
+        const imgsrc = await new Promise((resolve) => {
           const reader = new FileReader()
           reader.onload = () => {
             return resolve(reader.result)
@@ -244,7 +244,7 @@ export default class Account implements PrimaryClass {
       inp.click()
     }
   }
-  renImage(): void {
+  private renImage(): void {
     const eimage = <HTMLDivElement>this.el.querySelector(".userphoto .outer-img")
     if (eimage.firstChild) eimage.firstChild.remove()
     const img = new Image()
@@ -253,22 +253,22 @@ export default class Account implements PrimaryClass {
     img.alt = db.me.username ?? ""
     eimage.prepend(img)
   }
-  renUname(): void {
+  private renUname(): void {
     const euname = <HTMLParagraphElement>this.el.querySelector(".username .outer .chp-f p")
     euname.innerHTML = <string>db.me.username
     if (db.me.badges) setbadge(euname, db.me.badges)
   }
-  renDname(): void {
+  private renDname(): void {
     const edname = <HTMLParagraphElement>this.el.querySelector(".userdisplayname .outer .chp-f p")
     edname.innerText = <string>db.me.displayname
   }
-  renBio(): void {
+  private renBio(): void {
     const ebio = <HTMLParagraphElement>this.el.querySelector(".userbio .outer .chp-f p")
     ebio.innerText = db.me.bio || lang.ACC_NOBIO
   }
-  renEmails(): void {
+  private renEmails(): void {
     const eemails = <HTMLParagraphElement>this.el.querySelector(".useremail .outer .chp-f")
-    db.me.email?.forEach(sid => {
+    db.me.email?.forEach((sid) => {
       eemails.append(kelement("p", null, { e: `${sid.email} - ${sid.provider}` }))
     })
   }

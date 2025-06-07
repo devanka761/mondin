@@ -3,18 +3,18 @@ import nodemailer, { Transporter } from "nodemailer"
 import db from "../main/db"
 import { isProd, rNumber } from "../main/helper"
 import validate from "../main/validate"
-import { PayloadData } from "../types/validate.types"
+import { IRepBackData, IRepBackRec, PayloadData } from "../types/validate.types"
 import cfg from "../main/cfg"
 import { TempUserData, UserUID, ValidProviders } from "../types/binder.types"
 import { UserProcess } from "../types/db.types"
 import * as haccount from "./account.controller"
 
-export function isLogged(uid?: UserUID) {
+export function isLogged(uid?: UserUID): IRepBackRec {
   if (!uid) return { code: 400 }
   return haccount.getMe(uid)
 }
 
-export function login(s: PayloadData): PayloadData {
+export function login(s: PayloadData): IRepBackRec {
   if (!validate(["email"], s)) return { code: 400 }
   s.email = s.email.toString().toLowerCase()
   const mailValid = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g
@@ -48,11 +48,11 @@ export function login(s: PayloadData): PayloadData {
   return { code: 200, msg: "OK", data: { email: s.email } }
 }
 
-export function verify(s: PayloadData): PayloadData {
+export function verify(s: PayloadData): IRepBackRec {
   if (!validate(["email", "code"], s)) return { code: 404 }
   s.email = s.email.toString().toLowerCase()
   const mailValid = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g
-  if (!s.email.match(mailValid)) return { code: 404, msg: "AUTH_ERR_02", text: "Your email address is not valid" }
+  if (!s.email.match(mailValid)) return { code: 404, msg: "AUTH_ERR_02" }
   s.code = Number(s.code)
 
   const tdb = db.ref.t
@@ -69,10 +69,10 @@ export function verify(s: PayloadData): PayloadData {
   if (tdb[dbkey].otp.code !== s.code) return { code: 400, msg: "AUTH_ERR_04" }
   if (<number>tdb[dbkey].otp.expiry < Date.now()) return { code: 400, msg: "AUTH_ERR_05", data: { restart: 1 } }
 
-  return <PayloadData>processUser(s.email, dbkey)
+  return processUser(s.email, dbkey)
 }
 
-export function processUser(email: string, dbkey: string): PayloadData {
+export function processUser(email: string, dbkey: string): IRepBackRec {
   const provider: ValidProviders = "kirimin"
 
   const udb = db.ref.u
@@ -91,10 +91,10 @@ export function processUser(email: string, dbkey: string): PayloadData {
   data.user.data.id = ukey
   data.user.id = ukey
   delete db.ref.t[dbkey]
-  return { code: 200, data: { user: { id: data.user.id, data: <PayloadData>data.user.data } } }
+  return { code: 200, data: { user: { id: data.user.id, data: data.user.data as IRepBackData } } }
 }
 
-export function processThirdParty(s: { user: PayloadData; provider: string }): PayloadData {
+export function processThirdParty(s: { user: PayloadData; provider: string }): IRepBackRec {
   const udb = db.ref.u
   const userInfo: TempUserData = {
     email: <string>s.user.email,
@@ -117,7 +117,7 @@ export function processThirdParty(s: { user: PayloadData; provider: string }): P
   db.ref.u[ukey].data = [data.user.data]
   db.save("u")
   data.user.id = ukey
-  return { code: 200, data: { user: { id: data.user.id, data: <PayloadData>data.user.data } } }
+  return { code: 200, data: { user: { id: data.user.id, data: data.user.data as IRepBackData } } }
 }
 const emailQueue: { index: number; done: number } = { index: 0, done: 0 }
 
@@ -141,7 +141,7 @@ function sendEmailCode(emailIndex: number, user_email: string, gen_code: string)
   })
 
   const email_file = fs
-    .readFileSync("./server/html/email_code.ejs", "utf-8")
+    .readFileSync("./src/server/html/email_code.ejs", "utf-8")
     .replace(/{GEN_CODE}/g, gen_code)
     .replace(/{YEAR}/g, new Date().getFullYear().toString())
 

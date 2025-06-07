@@ -1,4 +1,4 @@
-import LangID from "../../../client/locales/id.json"
+import LangID from "../../../public/locales/id.json"
 type PossibleData = {
   [key: string]: string | number | PossibleData | string[] | number[] | PossibleData[]
 }

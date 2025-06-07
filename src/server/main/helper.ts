@@ -1,6 +1,6 @@
 import crypto, { Cipher, Decipher } from "crypto"
 import cfg from "./cfg"
-import { PayloadData } from "../types/validate.types"
+import { IRepBack, IRepBackRec } from "../types/validate.types"
 
 export const peerKey: string = crypto.randomBytes(16).toString("hex")
 
@@ -10,8 +10,8 @@ export function genhex(): string {
   return crypto.randomBytes(8).toString("hex") + Date.now().toString(36)
 }
 
-export function rep(options: { ok?: boolean; code: number; data?: object | null; msg?: string } = { ok: false, code: 400, data: null }): PayloadData {
-  const repdata: PayloadData = Object.assign(
+export function rep(options: IRepBackRec): IRepBack {
+  const repdata: IRepBack = Object.assign(
     {},
     {
       ok: false,
@@ -20,7 +20,7 @@ export function rep(options: { ok?: boolean; code: number; data?: object | null;
     },
     typeof options === "string" ? {} : options
   )
-  if (options.data && typeof options.data === "object") repdata.data = <PayloadData>options.data
+  if (options.data && typeof options.data === "object") repdata.data = options.data
   if (options.code === 200) {
     repdata.ok = true
     repdata.msg = "OK"

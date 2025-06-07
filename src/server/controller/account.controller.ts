@@ -4,6 +4,7 @@ import db from "../main/db"
 import { AccountDB } from "../types/account.types"
 import { genhex, isProd, peerKey } from "../main/helper"
 import cfg from "../main/cfg"
+import { IRepBackData, IRepBackRec } from "../types/validate.types"
 
 function initPeer(uid: string): PeerDB {
   const peerid = genhex()
@@ -33,7 +34,7 @@ function initPeer(uid: string): PeerDB {
   return data
 }
 
-export function getMe(uid: string): { code: number; data?: AccountDB } {
+export function getMe(uid: string): IRepBackRec {
   const udb = db.ref.u[uid]
   if (!udb) return { code: 400 }
 
@@ -44,7 +45,7 @@ export function getMe(uid: string): { code: number; data?: AccountDB } {
   meData.displayname = udb.dname
   meData.bio = udb.bio
   meData.badges = udb.b
-  meData.email = udb.data.map(usr => {
+  meData.email = udb.data.map((usr) => {
     return { email: <string>usr.email, provider: <string>usr.provider }
   })
 
@@ -52,12 +53,12 @@ export function getMe(uid: string): { code: number; data?: AccountDB } {
     me: meData,
     peer: initPeer(uid)
   }
-  return { code: 200, data }
+  return { code: 200, data: data as IRepBackData }
 }
 
 const dvnkzName = ["dvnkz", "dvnkz_", "devanka", "devanka761", "devanka7", "devanka76"]
 
-export function setUsername(uid: string, s: { uname: string }) {
+export function setUsername(uid: string, s: { uname: string }): IRepBackRec {
   const udb = db.ref.u[uid]
   if (udb.lu && udb.lu > Date.now()) return { code: 429, data: { timestamp: udb.lu } }
   if (s.uname.length < 4 && s.uname.length > 20) return { code: 400, msg: "ACC_FAIL_UNAME_LENGTH" }
@@ -65,7 +66,7 @@ export function setUsername(uid: string, s: { uname: string }) {
   const unamedeny = /^user/
   if (!s.uname.match(unamevalid)) return { code: 400, msg: "ACC_FAIL_UNAME_FORMAT" }
   if (s.uname.match(unamedeny)) return { code: 400, msg: "ACC_FAIL_CLAIMED" }
-  if (dvnkzName.find(usr => usr === s.uname)) return { code: 400, msg: "ACC_FAIL_CLAIMED" }
+  if (dvnkzName.find((usr) => usr === s.uname)) return { code: 400, msg: "ACC_FAIL_CLAIMED" }
   if (s.uname === udb.uname) return { code: 200, data: { text: s.uname } }
 
   db.ref.u[uid].uname = s.uname
@@ -73,7 +74,7 @@ export function setUsername(uid: string, s: { uname: string }) {
   db.save("u")
   return { code: 200, data: { text: s.uname } }
 }
-export function setDisplayname(uid: string, s: { dname: string }) {
+export function setDisplayname(uid: string, s: { dname: string }): IRepBackRec {
   s.dname = s.dname.trim()
   const udb = db.ref.u[uid]
   if (udb.ld && udb.ld > Date.now()) return { code: 429, data: { timestamp: udb.ld } }
@@ -86,7 +87,7 @@ export function setDisplayname(uid: string, s: { dname: string }) {
   return { code: 200, data: { text: s.dname } }
 }
 
-export function setBio(uid: string, s: { bio: string }) {
+export function setBio(uid: string, s: { bio: string }): IRepBackRec {
   s.bio = s.bio.trim()
   const udb = db.ref.u[uid]
   if (udb.lb && udb.lb > Date.now()) return { code: 429, data: { timestamp: udb.lb } }
@@ -103,21 +104,21 @@ export function setBio(uid: string, s: { bio: string }) {
   return { code: 200, data: { text: s.bio } }
 }
 
-export function setImg(uid: string, s: { img: string; name: string }) {
+export function setImg(uid: string, s: { img: string; name: string }): IRepBackRec {
   const dataurl = decodeURIComponent(s.img)
   const buffer = Buffer.from(dataurl.split(",")[1], "base64")
   if (buffer.length > 2500000) return { code: 413, msg: "ACC_FILE_LIMIT" }
 
-  if (!fs.existsSync(`./server/stg/user`)) fs.mkdirSync(`./server/stg/user`)
+  if (!fs.existsSync(`./dist/stg/user`)) fs.mkdirSync(`./dist/stg/user`)
 
   const udb = db.ref.u[uid]
   if (udb.img) {
-    if (fs.existsSync(`./server/stg/user/${udb.img}`)) fs.unlinkSync(`./server/stg/user/${udb.img}`)
+    if (fs.existsSync(`./dist/stg/user/${udb.img}`)) fs.unlinkSync(`./dist/stg/user/${udb.img}`)
   }
 
   const imgExt = /\.([a-zA-Z0-9]+)$/
   const imgName = `${uid}${Date.now().toString(35)}.${s.name.match(imgExt)?.[1]}`
-  fs.writeFileSync(`./server/stg/user/${imgName}`, buffer)
+  fs.writeFileSync(`./dist/stg/user/${imgName}`, buffer)
 
   db.ref.u[uid].img = imgName
   db.save("u")

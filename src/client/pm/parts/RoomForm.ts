@@ -2,12 +2,14 @@ import { ss } from "../../helper/escaper"
 import kelement from "../../helper/kelement"
 import { lang } from "../../helper/lang"
 import modal from "../../helper/modal"
+import MessageWriter from "../../main/MessageWriter"
+import db from "../../manager/db"
 import mediaCheck from "../../manager/mediaCheck"
 import { RoomFormContent } from "../../types/room.types"
 import Room from "../content/Room"
 
 const contents: RoomFormContent = {}
-// let editID: string | null = null
+let editID: string | null = null
 
 function createAttach() {
   const attachMedia = kelement("div", "media")
@@ -27,11 +29,13 @@ export default class RoomForm {
   private btnVoice: HTMLDivElement
   private textarea: HTMLTextAreaElement
   private canSend: boolean
+  private downed: Set<string>
   constructor({ room }) {
     this.id = "roomform"
     this.isLocked = false
     this.room = room
     this.canSend = false
+    this.downed = new Set()
   }
   createElement(): void {
     this.btnEmoji = kelement("div", "btn btn-emoji", { e: `<i class="fa-solid fa-face-smile"></i>` })
@@ -52,16 +56,48 @@ export default class RoomForm {
   }
   btnListener(): void {
     this.textarea.oninput = () => this.growArea()
+    this.textarea.onkeydown = (e) => this.keyDown(e)
+    this.textarea.onkeyup = (e) => this.keyUp(e)
     this.btnImage.onclick = () => this.findFile(true)
     this.btnAttach.onclick = () => this.findFile()
-    this.btnVoice.onclick = () => this.sendMessage()
+    this.btnVoice.onclick = () => {
+      if (this.canSend) {
+        this.textarea.focus()
+        return this.sendMessage()
+      }
+    }
+  }
+  keyDown(e: KeyboardEvent): void {
+    const key = e.key.toLowerCase()
+    if (key === "shift") this.downed.add(key)
+    if (key === "enter" && this.downed.has("shift") && this.canSend) {
+      e.preventDefault()
+      this.sendMessage()
+    }
+  }
+  keyUp(e: KeyboardEvent): void {
+    const key = e.key.toLowerCase()
+    if (key === "shift" && this.downed.has(key)) this.downed.delete(key)
   }
   sendMessage(): void {
-    if (!this.canSend) {
-      console.log("no text")
-      return
-    }
-    console.log(this.textarea.value)
+    if (this.isLocked) return
+    if (!this.canSend) return
+
+    const messageWriter: MessageWriter = new MessageWriter()
+    messageWriter.setText(this.textarea.value)
+    messageWriter.setUserId(<string>db.me.id)
+    if (contents.rep) messageWriter.setReply(contents.rep)
+    if (contents.file) messageWriter.addFile(contents.file)
+    if (contents.voice) messageWriter.addVoice(contents.voice)
+    if (editID) messageWriter.setEdit(editID)
+    messageWriter.setTimeStamp().toJSON()
+    this.room.sendMessage(messageWriter)
+    this.clearForm()
+  }
+  private clearForm() {
+    this.closeAttach()
+    this.closeEdit()
+    this.textarea.value = ""
   }
   findFile(imageOnly?: boolean): void {
     const inp = document.createElement("input")
@@ -77,9 +113,9 @@ export default class RoomForm {
 
       const file = inp.files[0]
 
-      const filesrc: string | ArrayBuffer | null = await new Promise(resolve => {
+      const filesrc: string = await new Promise((resolve) => {
         const reader = new FileReader()
-        reader.onload = () => resolve(reader.result)
+        reader.onload = () => resolve(reader.result?.toString() || "null")
         reader.readAsDataURL(file)
       })
       while (attachMedia.lastChild) attachMedia.lastChild.remove()
@@ -106,11 +142,8 @@ export default class RoomForm {
     }
     inp.click()
   }
-  attImage(eattach: HTMLDivElement, filename: string, filesrc: string | ArrayBuffer | null): void {
-    if (typeof filesrc !== "string") {
-      this.attDocument(eattach, filename)
-      return
-    }
+  attImage(eattach: HTMLDivElement, filename: string, filesrc: string): void {
+    if (typeof filesrc !== "string") return this.attDocument(eattach, filename)
     const eimg = kelement("div", "img")
     const img = new Image()
     img.alt = filename
@@ -130,11 +163,8 @@ export default class RoomForm {
     eattach.append(eimg, ename)
     img.src = filesrc
   }
-  attVideo(eattach: HTMLDivElement, filename: string, filesrc: string | ArrayBuffer | null): void {
-    if (typeof filesrc !== "string") {
-      this.attDocument(eattach, filename)
-      return
-    }
+  attVideo(eattach: HTMLDivElement, filename: string, filesrc: string): void {
+    if (typeof filesrc !== "string") return this.attDocument(eattach, filename)
     const evid = kelement("div", "img")
     const ename = kelement("div", "name")
     ename.innerText = filename
@@ -178,7 +208,7 @@ export default class RoomForm {
       eedit.remove()
       this.textarea.value = ""
     }
-    // editID = null
+    editID = null
     this.growArea()
   }
   growArea(): void {

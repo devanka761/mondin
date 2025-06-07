@@ -1,8 +1,8 @@
 import fs from "fs"
 import { Databases, DBPerKey, User } from "../types/db.types"
 
-const dirpath: string = "./server/db"
-const stgpath: string = "./server/stg"
+const dirpath: string = "./dist/db"
+const stgpath: string = "./dist/stg"
 
 const filefolders: string[] = ["chats", "groups"]
 

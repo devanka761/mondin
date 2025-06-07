@@ -1,10 +1,11 @@
 import db from "../main/db"
 import zender from "../main/zender"
 import { UserProfile } from "../types/profile.types"
+import { IRepBackData, IRepBackRec } from "../types/validate.types"
 
 function isFriend(uid: string, userid: string): number {
   const cdb = db.ref.c
-  const isfriend = Object.values(cdb).find(ch => ch.u.includes(uid) && ch.u.includes(userid) && ch.f === 1)
+  const isfriend = Object.values(cdb).find((ch) => ch.u.includes(uid) && ch.u.includes(userid) && ch.f === 1)
   if (isfriend) return 1
   const udb = db.ref.u
   if (udb[userid].req?.includes(uid)) return 2
@@ -12,7 +13,7 @@ function isFriend(uid: string, userid: string): number {
   return 0
 }
 
-export function getUser(uid: string, userid: string) {
+export function getUser(uid: string, userid: string): IRepBackData {
   const udb = db.ref.u[userid]
   const data: UserProfile = {
     id: udb.id,
@@ -23,22 +24,22 @@ export function getUser(uid: string, userid: string) {
   if (udb.b) data.badges = udb.b
   if (udb.bio) data.bio = udb.bio
   if (udb.img) data.image = udb.img
-  return data
+  return { ...data }
 }
 
 export function searchUser(uid: string, userid: string) {
   const udb = db.ref.u
   const users = Object.values(udb)
-    .filter(usr => {
+    .filter((usr) => {
       return usr.id !== uid && (usr.id === userid || usr.uname?.includes(userid))
     })
-    .map(usr => getUser(uid, usr.id))
+    .map((usr) => getUser(uid, usr.id))
 
   if (users.length < 1) return { code: 404, msg: "FIND_NOTFOUND" }
   return { code: 200, data: { users } }
 }
 
-export function addfriend(uid: string, s: { userid: string }) {
+export function addfriend(uid: string, s: { userid: string }): IRepBackRec {
   const udb = db.ref.u[s.userid]
   if (!udb) return { code: 404 }
   const mdb = db.ref.u[uid]
@@ -54,14 +55,14 @@ export function addfriend(uid: string, s: { userid: string }) {
   zender(uid, s.userid, "addfriend", { id: uid })
   return { code: 200, data: { user: getUser(uid, s.userid) } }
 }
-export function unfriend(uid: string, s: { userid: string }) {
+export function unfriend(uid: string, s: { userid: string }): IRepBackRec {
   const udb = db.ref.u[s.userid]
   if (!udb) return { code: 404 }
-  if (udb.req?.includes(uid)) db.ref.u[s.userid].req = udb.req.filter(k => k !== uid)
+  if (udb.req?.includes(uid)) db.ref.u[s.userid].req = udb.req.filter((k) => k !== uid)
   const mdb = db.ref.u[uid]
-  if (mdb.req?.includes(s.userid)) db.ref.u[uid].req = mdb.req.filter(k => k !== s.userid)
+  if (mdb.req?.includes(s.userid)) db.ref.u[uid].req = mdb.req.filter((k) => k !== s.userid)
   const cdb = db.ref.c
-  const friendkey = Object.keys(cdb).find(k => {
+  const friendkey = Object.keys(cdb).find((k) => {
     return cdb[k].u.includes(uid) && cdb[k].u.includes(s.userid) && cdb[k].f === 1
   })
   if (!friendkey) return { code: 200, data: { user: getUser(uid, s.userid) } }
@@ -71,28 +72,28 @@ export function unfriend(uid: string, s: { userid: string }) {
   zender(uid, s.userid, "unfriend", { id: uid })
   return { code: 200, data: { user: getUser(uid, s.userid) } }
 }
-export function cancelfriend(uid: string, s: { userid: string }) {
+export function cancelfriend(uid: string, s: { userid: string }): IRepBackRec {
   const udb = db.ref.u[s.userid]
   if (!udb) return { code: 404 }
   if (!udb.req || !udb.req.includes(uid)) return { code: 200, data: { user: getUser(uid, s.userid) } }
-  db.ref.u[s.userid].req = udb.req.filter(key => key !== uid)
+  db.ref.u[s.userid].req = udb.req.filter((key) => key !== uid)
   db.save("u")
 
   zender(uid, s.userid, "cancelfriend", { id: uid })
   return { code: 200, data: { user: getUser(uid, s.userid) } }
 }
-export function acceptfriend(uid: string, s: { userid: string }) {
+export function acceptfriend(uid: string, s: { userid: string }): IRepBackRec {
   if (uid === s.userid) return { code: 400 }
   const udb = db.ref.u[s.userid]
   if (!udb) return { code: 404 }
   const isfriend = isFriend(uid, s.userid)
   if (isfriend === 1) return { code: 200, data: { user: getUser(uid, s.userid) } }
-  if (udb.req?.includes(uid)) db.ref.u[s.userid].req = udb.req.filter(k => k !== uid)
+  if (udb.req?.includes(uid)) db.ref.u[s.userid].req = udb.req.filter((k) => k !== uid)
   const mdb = db.ref.u[uid]
   if (!mdb.req || !mdb.req.includes(s.userid)) return { code: 404, data: { user: getUser(uid, s.userid) } }
-  db.ref.u[uid].req = mdb.req.filter(k => k !== s.userid)
+  db.ref.u[uid].req = mdb.req.filter((k) => k !== s.userid)
   const cdb = db.ref.c
-  const oldfriendkey = Object.keys(cdb).find(k => {
+  const oldfriendkey = Object.keys(cdb).find((k) => {
     return cdb[k].u.includes(uid) && cdb[k].u.includes(s.userid) && cdb[k].f === 1
   })
 
@@ -108,12 +109,12 @@ export function acceptfriend(uid: string, s: { userid: string }) {
   zender(uid, s.userid, "acceptfriend", { id: uid })
   return { code: 200, data: { user: getUser(uid, s.userid) } }
 }
-export function ignorefriend(uid: string, s: { userid: string }) {
+export function ignorefriend(uid: string, s: { userid: string }): IRepBackRec {
   const udb = db.ref.u[s.userid]
   if (!udb) return { code: 404 }
-  if (udb.req?.includes(uid)) db.ref.u[s.userid].req = udb.req.filter(key => key !== uid)
+  if (udb.req?.includes(uid)) db.ref.u[s.userid].req = udb.req.filter((key) => key !== uid)
   const mdb = db.ref.u[uid]
-  if (mdb.req?.includes(s.userid)) db.ref.u[uid].req = mdb.req.filter(key => key !== s.userid)
+  if (mdb.req?.includes(s.userid)) db.ref.u[uid].req = mdb.req.filter((key) => key !== s.userid)
   db.save("u")
 
   zender(uid, s.userid, "ignorefriend", { id: uid })

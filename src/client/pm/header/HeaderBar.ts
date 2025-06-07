@@ -15,7 +15,7 @@ class HeaderBar {
     this.appname = "KIRIMIN"
     this.isLocked = false
   }
-  createElement(): void {
+  private createElement(): void {
     this.el = kelement("div", "header")
     this.apptitle = kelement("div", "title", { e: "KIRIMIN" })
     this.eactions = kelement("div", "actions")
@@ -26,7 +26,7 @@ class HeaderBar {
     this.el.append(this.apptitle, this.eactions)
     this.eactions.append(this.btn_find, this.btn_settings)
   }
-  btnListener(): void {
+  private btnListener(): void {
     this.btn_find.onclick = async () => {
       const navFind = <HTMLElement>document.querySelector(".nav-find")
       if (navFind) navFind.click()

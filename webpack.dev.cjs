@@ -54,7 +54,7 @@ module.exports = {
   target: ["web", "es6"],
   entry,
   output: {
-    path: path.resolve(__dirname, "client/bundle"),
+    path: path.resolve(__dirname, "public/bundle"),
     filename: "[name].js",
     clean: true
   },

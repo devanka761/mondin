@@ -11,28 +11,33 @@ router.use(cdUser, isUser, express.json({ limit: "100KB" }))
 
 router.post("/addfriend", (req: Request, res: Response) => {
   if (!validate(["userid"], req.body)) res.json(rep({ code: 400 }))
-  res.json(rep(hprofile.addfriend(<string>req.user?.id, req.body)))
+  const addfriend = rep(hprofile.addfriend(<string>req.user?.id, req.body))
+  res.status(addfriend.code).json(addfriend)
 })
 router.post("/unfriend", (req: Request, res: Response) => {
   if (!validate(["userid"], req.body)) res.json(rep({ code: 400 }))
-  res.json(rep(hprofile.unfriend(<string>req.user?.id, req.body)))
+  const unfriend = rep(hprofile.unfriend(<string>req.user?.id, req.body))
+  res.status(unfriend.code).json(unfriend)
 })
 router.post("/cancelfriend", (req: Request, res: Response) => {
   if (!validate(["userid"], req.body)) res.json(rep({ code: 400 }))
-  res.json(rep(hprofile.cancelfriend(<string>req.user?.id, req.body)))
+  const cancelfriend = rep(hprofile.cancelfriend(<string>req.user?.id, req.body))
+  res.status(cancelfriend.code).json(cancelfriend)
 })
 router.post("/acceptfriend", (req: Request, res: Response) => {
   if (!validate(["userid"], req.body)) res.json(rep({ code: 400 }))
-  res.json(rep(hprofile.acceptfriend(<string>req.user?.id, req.body)))
+  const acceptfriend = rep(hprofile.acceptfriend(<string>req.user?.id, req.body))
+  res.status(acceptfriend.code).json(acceptfriend)
 })
 router.post("/ignorefriend", (req: Request, res: Response) => {
   if (!validate(["userid"], req.body)) res.json(rep({ code: 400 }))
-  res.json(rep(hprofile.ignorefriend(<string>req.user?.id, req.body)))
+  const ignorefriend = rep(hprofile.ignorefriend(<string>req.user?.id, req.body))
+  res.status(ignorefriend.code).json(ignorefriend)
 })
 
 router.get("/search/:search_id", (req: Request, res: Response) => {
   const searchUser = rep(hprofile.searchUser(<string>req.user?.id, req.params.search_id))
-  res.json(searchUser)
+  res.status(searchUser.code).json(searchUser)
 })
 
 export default router

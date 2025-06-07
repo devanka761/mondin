@@ -18,11 +18,11 @@ export default class Profile implements PrimaryClass {
   private el: HTMLDivElement
   public user: UserDB
   private classBefore?: PrimaryClass
-  constructor({ user, classBefore }) {
+  constructor(s: { user: UserDB; classBefore?: PrimaryClass }) {
     this.id = "profile"
     this.isLocked = false
-    this.user = user
-    this.classBefore = classBefore
+    this.user = s.user
+    this.classBefore = s.classBefore
   }
   createElement(): void {
     this.el = kelement("div", "Profile pmcontent")
@@ -115,21 +115,21 @@ export default class Profile implements PrimaryClass {
     this.user = userData
     const { isFriend } = userData
 
-    const currKey = Object.keys(db.c).find(k => {
+    const currKey = Object.keys(db.c).find((k) => {
       return db.c[k].u.id === this.user.id
     })
     if (currKey) {
       db.c[currKey].u.isFriend = isFriend
       if (isFriend === 1 && db.me.req) {
-        db.me.req = db.me.req.filter(usr => usr.id !== userData.id)
+        db.me.req = db.me.req.filter((usr) => usr.id !== userData.id)
         if (db.unread.c) delete db.unread.c[currKey]
       } else if (isFriend === 2) {
-        db.me.req = (db.me.req || []).filter(usr => usr.id !== userData.id)
+        db.me.req = (db.me.req || []).filter((usr) => usr.id !== userData.id)
       } else if (isFriend === 3) {
         if (!db.me.req) db.me.req = []
         db.me.req.push(userData)
       } else if (db.me.req) {
-        db.me.req = db.me.req.filter(usr => usr.id !== userData.id)
+        db.me.req = db.me.req.filter((usr) => usr.id !== userData.id)
       }
     }
 

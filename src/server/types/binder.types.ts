@@ -26,10 +26,3 @@ export type UserUID = string
 export type PossibleData = {
   [key: string]: string | number | boolean
 }
-
-export type RepBack = {
-  ok: boolean
-  code: number
-  msg: string
-  data?: object | null
-}

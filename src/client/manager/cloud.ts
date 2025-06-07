@@ -43,8 +43,8 @@ class cloud {
   //   const peerConn = new PeerConn({ cloud: this, id: s.id, peer: conn_peer_id })
   //   peerConn.run(s)
   // }
-  listenTo() {
-    this.peer.on("error", err => {
+  private listenTo() {
+    this.peer.on("error", (err) => {
       if (err.type === "peer-unavailable") return
       if (err.type === "browser-incompatible") {
         connectedToPeer.done = 2
@@ -58,7 +58,7 @@ class cloud {
       }
     })
 
-    this.peer.on("connection", conn => {
+    this.peer.on("connection", (conn) => {
       conn.on("open", () => {
         console.info("connected_a", conn.peer)
         this.pair.set(conn.peer, conn)
@@ -82,7 +82,7 @@ class cloud {
       // ;(this.peer.socket as unknown as ExtendedSocket)._socket.send(JSON.stringify({ kirimin: { id: "testing" } }))
       // this.peer.socket._socket.send({ kirimin: { id: "testing" } })
       // this.peer.on("")
-      this.peer.socket._socket?.addEventListener("message", msg => {
+      this.peer.socket._socket?.addEventListener("message", (msg) => {
         if (msg.data) {
           if (reqtimeout) {
             clearTimeout(reqtimeout)
@@ -90,7 +90,7 @@ class cloud {
           }
           const cloud_hb = JSON.parse(msg.data)
           if (cloud_hb.s) {
-            Object.keys(cloud_hb.s).forEach(k => {
+            Object.keys(cloud_hb.s).forEach((k) => {
               const clientData = new ClientData({ id: k })
               clientData.init(cloud_hb.s[k])
             })
@@ -99,7 +99,7 @@ class cloud {
       })
     })
   }
-  connectTo(id: string, currIndex: number, folFunc?: VoidFunction) {
+  private connectTo(id: string, currIndex: number, folFunc?: VoidFunction) {
     if (mapPair.d + 1 !== currIndex) return setTimeout(() => this.connectTo(id, currIndex, folFunc), 200)
 
     if (this.pair.has(id)) {
@@ -232,7 +232,7 @@ class cloud {
   //   timesReconnect = 0
   //   notip({ ic: "plug-circle-check", a: "CONNECTED", c: "1" })
   // }
-  async checkuser() {
+  private async checkuser() {
     const stillUser = await xhr.get("/x/auth/stillUser")
     if (stillUser && stillUser.data && stillUser.data.peer !== this.peerid) {
       if (reqtimeout) clearTimeout(reqtimeout)
@@ -241,7 +241,7 @@ class cloud {
       return this.forceClose()
     }
   }
-  async forceClose() {
+  private async forceClose() {
     // if(!reqtimeout || this.isStopped) return;
     reqtimeout = null
     this.peer.destroy()
@@ -249,7 +249,7 @@ class cloud {
     new ForceClose(peerError).init()
   }
   async run(s: PeerDB) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const { peerid, peerConfig } = s
       this.peerid = peerid
       this.peer = new Peer(peerid, peerConfig)
