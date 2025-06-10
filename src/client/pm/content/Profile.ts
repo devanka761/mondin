@@ -11,6 +11,7 @@ import { UserProfile } from "../../../server/types/profile.types"
 import db from "../../manager/db"
 import swiper from "../../manager/swiper"
 import Room from "./Room"
+import { RoomDetail } from "../../types/room.types"
 
 export default class Profile implements PrimaryClass {
   readonly id: string
@@ -77,7 +78,19 @@ export default class Profile implements PrimaryClass {
   btnListener(): void {
     // btn-chat
     const btnChat = <HTMLDivElement>this.el.querySelector(".btn-chat")
-    btnChat.onclick = () => swiper(new Room({ user: this.user }), userState.currcontent)
+    btnChat.onclick = () => {
+      const roomDetail: RoomDetail = {
+        type: "user",
+        id: this.user.id,
+        name: {
+          short: this.user.username,
+          full: this.user.displayname
+        }
+      }
+      if (this.user.badges) roomDetail.badges = this.user.badges
+      if (this.user.image) roomDetail.img = this.user.image
+      swiper(new Room({ data: roomDetail, users: [this.user] }), userState.currcontent)
+    }
   }
   clearOptions(eoptions: HTMLDivElement): void {
     while (eoptions.lastChild) eoptions.lastChild.remove()
@@ -115,14 +128,16 @@ export default class Profile implements PrimaryClass {
     this.user = userData
     const { isFriend } = userData
 
-    const currKey = Object.keys(db.c).find((k) => {
-      return db.c[k].u.id === this.user.id
+    const currChat = Object.values(db.c).find((k) => {
+      return k.u.find((usr) => usr.id === this.user.id)
+      // return db.c[k].u.find((usr) => usr.id === this.user.id)
     })
-    if (currKey) {
-      db.c[currKey].u.isFriend = isFriend
+    const currUser = currChat?.u.find((usr) => usr.id === this.user.id)
+    if (currUser) {
+      currUser.isFriend = isFriend
       if (isFriend === 1 && db.me.req) {
         db.me.req = db.me.req.filter((usr) => usr.id !== userData.id)
-        if (db.unread.c) delete db.unread.c[currKey]
+        if (db.unread.r) db.unread.r = db.unread.r.filter((k) => k !== currUser.id)
       } else if (isFriend === 2) {
         db.me.req = (db.me.req || []).filter((usr) => usr.id !== userData.id)
       } else if (isFriend === 3) {

@@ -1,4 +1,5 @@
 import { UserProfile } from "../../server/types/profile.types"
+import { IMessageWriter } from "./message.types"
 
 export interface EmailProvider {
   provider: string
@@ -26,9 +27,9 @@ export interface PeerDB {
 }
 
 export interface MeDB {
-  id?: string
-  username?: string
-  displayname?: string
+  id: string
+  username: string
+  displayname: string
   email?: EmailProvider[]
   badges?: number[]
   bio?: string
@@ -36,7 +37,6 @@ export interface MeDB {
   req?: UserProfile[]
 }
 
-export type ChatType = "text" | "image" | "video" | "audio" | "file" | "deleted" | "call"
 export interface UserDB {
   id: string
   username: string
@@ -46,28 +46,22 @@ export interface UserDB {
   image?: string
   isFriend?: number
 }
-export interface ChatDB {
+export interface ChatDB extends IMessageWriter {
+  id: string
   userid: string
   timestamp: number
-  watch?: string[]
-  text?: string
-  edit?: string
-  type?: ChatType
-  reply?: string
-  url?: string
 }
 export interface ChatsDB {
-  u: UserDB
-  c: {
-    [key: string]: ChatDB
-  }
+  id: string
+  u: UserDB[]
+  c: ChatDB[]
 }
 export interface Databases {
   me: MeDB
-  c: { [key: string]: ChatsDB }
+  c: ChatsDB[]
   unread: {
-    g?: { [key: string]: string | number | boolean }
-    c?: { [key: string]: string | number | boolean }
-    r?: { [key: string]: string | number | boolean }
+    g?: (string | number | boolean)[]
+    c?: (string | number | boolean)[]
+    r?: (string | number | boolean)[]
   }
 }

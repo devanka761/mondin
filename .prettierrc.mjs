@@ -1,7 +1,7 @@
-{
+export default {
   "arrowParens": "always",
-  "printWidth": 500,
+  "printWidth": Infinity,
   "semi": false,
   "singleQuote": false,
   "trailingComma": "none"
-}
+};

@@ -20,7 +20,7 @@ export type PayloadData = {
 //   [key: string]: string | number | boolean | (string | number | boolean)[] | { [key: string]: string | number | boolean | (string | number | boolean)[] | { [key: string]: string | number | boolean | (string | number | boolean)[] } }
 // }
 export interface IRepBackData {
-  [key: string]: string | number | boolean | IRepBackData | (string | number | boolean | IRepBackData)[]
+  [key: string]: string | number | boolean | IRepBackData | string[] | number[] | boolean[] | IRepBackData[] | (string | number | boolean | IRepBackData)[]
 }
 export interface IRepBack {
   ok: boolean

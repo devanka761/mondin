@@ -1,3 +1,5 @@
+import { UserDB } from "./db.types"
+
 export type IMessageWriterVoice = string
 
 export interface IMessageWriterFiles {
@@ -5,7 +7,7 @@ export interface IMessageWriterFiles {
   src: string
 }
 
-export type IMessageWriterType = "text" | "image" | "video" | "audio" | "file" | "deleted" | "call"
+export type IMessageWriterType = "text" | "image" | "video" | "audio" | "file" | "deleted" | "call" | "voice"
 
 export interface IMessageWriter {
   userid?: string
@@ -14,7 +16,23 @@ export interface IMessageWriter {
   text?: string
   type?: IMessageWriterType
   edit?: string
+  edittime?: number
   reply?: string
   filesrc?: string
   filename?: string
+}
+
+export interface IMessageEmbed {
+  id: string
+  user: UserDB
+  type?: IMessageWriterType
+  media?: string
+  deleted?: boolean
+  text?: string
+}
+export interface IMessageBuilder extends IMessageWriter {
+  roomid: string
+  id: string
+  user: UserDB
+  embed?: IMessageEmbed
 }

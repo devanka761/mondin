@@ -4,7 +4,7 @@ import { Databases, DBPerKey, User } from "../types/db.types"
 const dirpath: string = "./dist/db"
 const stgpath: string = "./dist/stg"
 
-const filefolders: string[] = ["chats", "groups"]
+const filefolders: string[] = ["user", "group"]
 
 class DevankaLocal {
   public ref: Databases
@@ -19,8 +19,8 @@ class DevankaLocal {
       console.info(`Folder - ${filefolder} - Updated!`)
     }
     Object.keys(this.ref)
-      .filter(file => !["t", "v"].includes(file))
-      .forEach(file => {
+      .filter((file) => !["t", "v"].includes(file))
+      .forEach((file) => {
         const fileKey = file as keyof Databases
         if (!fs.existsSync(`${dirpath}/${fileKey}.json`)) {
           fs.writeFileSync(`${dirpath}/${fileKey}.json`, JSON.stringify(this.ref[fileKey]), "utf-8")
@@ -28,7 +28,7 @@ class DevankaLocal {
         const filebuffer = fs.readFileSync(`${dirpath}/${fileKey}.json`, "utf-8")
         this.ref[fileKey] = JSON.parse(filebuffer)
         if (fileKey === "u") {
-          Object.keys(this.ref[fileKey]).forEach(objkey => {
+          Object.keys(this.ref[fileKey]).forEach((objkey) => {
             const k = objkey as keyof User
             if (this.ref[fileKey][k].peer) delete this.ref[fileKey][k].peer
             if (this.ref[fileKey][k].zzz) delete this.ref[fileKey][k].zzz
@@ -50,7 +50,7 @@ class DevankaLocal {
   }
   save(...args: string[]): void {
     if (args.length < 1) {
-      args = Object.keys(this.ref).filter(file => !["t", "v"].includes(file))
+      args = Object.keys(this.ref).filter((file) => !["t", "v"].includes(file))
     }
     for (const arg of args) {
       const s = arg as keyof Databases

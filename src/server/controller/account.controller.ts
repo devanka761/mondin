@@ -1,6 +1,8 @@
 import fs from "fs"
-import { MeDB, PeerDB } from "../../client/types/db.types"
+import { ChatDB, ChatsDB, MeDB, PeerDB } from "../../client/types/db.types"
 import db from "../main/db"
+import * as hprofile from "./profile.controller"
+import * as hroom from "./room.controller"
 import { AccountDB } from "../types/account.types"
 import { genhex, isProd, peerKey } from "../main/helper"
 import cfg from "../main/cfg"
@@ -38,11 +40,12 @@ export function getMe(uid: string): IRepBackRec {
   const udb = db.ref.u[uid]
   if (!udb) return { code: 400 }
 
-  const meData: MeDB = {}
-  meData.id = udb.id
+  const meData: MeDB = {
+    id: udb.id,
+    username: udb.uname as string,
+    displayname: udb.dname as string
+  }
   meData.image = udb.img
-  meData.username = udb.uname
-  meData.displayname = udb.dname
   meData.bio = udb.bio
   meData.badges = udb.b
   meData.email = udb.data.map((usr) => {
@@ -53,6 +56,32 @@ export function getMe(uid: string): IRepBackRec {
     me: meData,
     peer: initPeer(uid)
   }
+
+  const cdb = db.ref.c
+  const meChatList: ChatsDB[] = Object.keys(cdb)
+    .filter((k) => {
+      return cdb[k].c && cdb[k].u.find((usr) => usr === uid)
+    })
+    .map((k) => {
+      const chatFile = db.fileGet(cdb[k].c as string, "user") || {}
+      return {
+        id: k,
+        u: [{ ...hprofile.getUser(uid, cdb[k].u.find((usr) => usr !== uid) as string) }],
+        c: Object.keys(chatFile).map((msgkey) => {
+          // const rawData = chatFile[msgkey]
+          // const chatData = {
+          //   ...rawData,
+          //   id: msgkey
+          // }
+          // return chatData as ChatDB
+          const rawData = chatFile[msgkey]
+          return { ...hroom.normalizeMessage(msgkey, rawData) }
+        })
+      }
+    })
+
+  data.c = meChatList
+
   return { code: 200, data: data as IRepBackData }
 }
 

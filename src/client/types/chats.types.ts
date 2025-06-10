@@ -1,6 +1,6 @@
 import { ChatDB, UserDB } from "./db.types"
 
-export type ChatType = "text" | "audio" | "image" | "video" | "call" | "file" | "deleted"
+export type ChatType = "text" | "audio" | "image" | "video" | "call" | "file" | "deleted" | "voice"
 export interface ChatUser {
   username: string
   id: string

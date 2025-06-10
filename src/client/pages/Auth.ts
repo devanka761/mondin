@@ -79,6 +79,7 @@ export default class Auth {
   private initializeData(s: AccountDB): void {
     if (s.peer) cloud.run(s.peer)
     if (s.me) db.me = s.me
+    if (s.c) db.c = s.c
     // const clientData = new ClientData({ id: k });
     // clientData.init(cloud_hb.s[k]);
   }

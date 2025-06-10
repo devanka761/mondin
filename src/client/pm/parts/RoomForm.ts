@@ -22,7 +22,7 @@ export default class RoomForm {
   public isLocked: boolean
   private room: Room
   private bottom: HTMLDivElement
-  public el: HTMLDivElement
+  private el: HTMLDivElement
   private btnEmoji: HTMLDivElement
   private btnAttach: HTMLDivElement
   private btnImage: HTMLDivElement
@@ -37,12 +37,12 @@ export default class RoomForm {
     this.canSend = false
     this.downed = new Set()
   }
-  createElement(): void {
+  private createElement(): void {
     this.btnEmoji = kelement("div", "btn btn-emoji", { e: `<i class="fa-solid fa-face-smile"></i>` })
     const eemoji = kelement("div", "emoji", { e: this.btnEmoji })
     this.textarea = kelement("textarea")
-    this.textarea.name = "content-input"
-    this.textarea.id = "content-input"
+    this.textarea.name = "content-input" + this.room.data.id
+    this.textarea.id = "content-input" + +this.room.data.id
     this.textarea.maxLength = 500
     this.textarea.placeholder = lang.TYPE_HERE
     const etextbox = kelement("div", "textbox", { e: this.textarea })
@@ -54,7 +54,7 @@ export default class RoomForm {
     const evoice = kelement("div", "voice", { e: this.btnVoice })
     this.el = kelement("div", "field", { e: [einput, evoice] })
   }
-  btnListener(): void {
+  private btnListener(): void {
     this.textarea.oninput = () => this.growArea()
     this.textarea.onkeydown = (e) => this.keyDown(e)
     this.textarea.onkeyup = (e) => this.keyUp(e)
@@ -67,7 +67,7 @@ export default class RoomForm {
       }
     }
   }
-  keyDown(e: KeyboardEvent): void {
+  private keyDown(e: KeyboardEvent): void {
     const key = e.key.toLowerCase()
     if (key === "shift") this.downed.add(key)
     if (key === "enter" && this.downed.has("shift") && this.canSend) {
@@ -75,11 +75,11 @@ export default class RoomForm {
       this.sendMessage()
     }
   }
-  keyUp(e: KeyboardEvent): void {
+  private keyUp(e: KeyboardEvent): void {
     const key = e.key.toLowerCase()
     if (key === "shift" && this.downed.has(key)) this.downed.delete(key)
   }
-  sendMessage(): void {
+  private sendMessage(): void {
     if (this.isLocked) return
     if (!this.canSend) return
 
@@ -90,8 +90,8 @@ export default class RoomForm {
     if (contents.file) messageWriter.addFile(contents.file)
     if (contents.voice) messageWriter.addVoice(contents.voice)
     if (editID) messageWriter.setEdit(editID)
-    messageWriter.setTimeStamp().toJSON()
-    this.room.sendMessage(messageWriter)
+    messageWriter.setTimeStamp()
+    this.room.sendMessage(messageWriter, true)
     this.clearForm()
   }
   private clearForm() {
@@ -99,7 +99,7 @@ export default class RoomForm {
     this.closeEdit()
     this.textarea.value = ""
   }
-  findFile(imageOnly?: boolean): void {
+  private findFile(imageOnly?: boolean): void {
     const inp = document.createElement("input")
     inp.type = "file"
     if (imageOnly) inp.accept = "image/*,video/*,video/x-matroska"
@@ -142,7 +142,7 @@ export default class RoomForm {
     }
     inp.click()
   }
-  attImage(eattach: HTMLDivElement, filename: string, filesrc: string): void {
+  private attImage(eattach: HTMLDivElement, filename: string, filesrc: string): void {
     if (typeof filesrc !== "string") return this.attDocument(eattach, filename)
     const eimg = kelement("div", "img")
     const img = new Image()
@@ -163,7 +163,7 @@ export default class RoomForm {
     eattach.append(eimg, ename)
     img.src = filesrc
   }
-  attVideo(eattach: HTMLDivElement, filename: string, filesrc: string): void {
+  private attVideo(eattach: HTMLDivElement, filename: string, filesrc: string): void {
     if (typeof filesrc !== "string") return this.attDocument(eattach, filename)
     const evid = kelement("div", "img")
     const ename = kelement("div", "name")
@@ -185,7 +185,7 @@ export default class RoomForm {
     eattach.append(evid, ename)
     vid.src = filesrc
   }
-  attDocument(eattach: HTMLDivElement, filename: string): void {
+  private attDocument(eattach: HTMLDivElement, filename: string): void {
     const p = kelement("p")
     const docFormat = /\.([a-zA-Z0-9]+)$/
     const docExt = filename.match(docFormat)?.[1]
@@ -196,13 +196,13 @@ export default class RoomForm {
     eattach.append(edoc)
     this.growArea()
   }
-  closeAttach(): void {
+  private closeAttach(): void {
     const eattach = this.bottom.querySelector(".attach")
     if (eattach) eattach.remove()
     delete contents.file
     this.growArea()
   }
-  closeEdit(): void {
+  private closeEdit(): void {
     const eedit = this.bottom.querySelector(".edit-embed")
     if (eedit) {
       eedit.remove()
@@ -211,7 +211,7 @@ export default class RoomForm {
     editID = null
     this.growArea()
   }
-  growArea(): void {
+  private growArea(): void {
     if (!this.canSend && (this.textarea.value.trim().length > 0 || contents.file?.src)) {
       this.canSend = true
       this.btnVoice.innerHTML = `<i class="fa-solid fa-paper-plane-top"></i>`
@@ -231,7 +231,7 @@ export default class RoomForm {
     const currHeight: number = textareaHeight < 30 ? textareaHeight + mediaHeight + 31 : textareaHeight + mediaHeight + 24
     this.room.resizeMiddle(currHeight)
   }
-  async focus(): Promise<void> {
+  private async focus(): Promise<void> {
     this.textarea.readOnly = true
     await modal.waittime(500)
     this.textarea.focus()

@@ -1,6 +1,6 @@
 import LangID from "../../../public/locales/id.json"
-type PossibleData = {
-  [key: string]: string | number | PossibleData | string[] | number[] | PossibleData[]
+export type PossibleData = {
+  [key: string]: string | number | boolean | PossibleData | string[] | number[] | boolean[] | PossibleData[] | (string | number | boolean | PossibleData)[]
 }
 export interface KiriminHttpResponse {
   ok: boolean

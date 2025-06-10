@@ -10,10 +10,8 @@ export interface TemporaryAuth {
   cd?: number
 }
 
-export interface DBPerKey {
-  [key: string]: {
-    [key: string]: string | number | boolean
-  }
+export type DBPerKey = {
+  [key: string]: string | number | boolean | DBPerKey | (string | number | boolean | DBPerKey)[]
 }
 
 export interface UserProcess {

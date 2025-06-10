@@ -8,7 +8,11 @@ import db from "../../manager/db"
 import { ChatCard } from "../../types/chats.types"
 import sdate from "../../helper/sdate"
 import { PrimaryClass } from "../../types/userState.types"
-import { ChatDB, ChatsDB } from "../../types/db.types"
+import { ChatDB, ChatsDB, UserDB } from "../../types/db.types"
+import swiper from "../../manager/swiper"
+import Room from "../content/Room"
+import { RoomDetail } from "../../types/room.types"
+import { PossibleData } from "../../types/helper.types"
 
 function transpile_lastchat(s: ChatDB): string {
   const myId = <string>db.me.id
@@ -33,8 +37,7 @@ function transpile_lastchat(s: ChatDB): string {
 
   if (s.userid === myId) {
     const isRead: boolean = (s.watch || []).filter((usrid) => usrid !== myId)?.length >= 1
-    const readStatus = kelement("i", `fa-regular fa-check${isRead ? "-double" : ""}`)
-    text = readStatus + text
+    text = `<i class="fa-regular fa-check${isRead ? "-double" : ""}"></i> ` + text
   }
 
   return text
@@ -48,12 +51,14 @@ function dateTime(timestamp: number): string {
 function chat_card(s: ChatCard): { [key: string]: HTMLDivElement } {
   const { user, lastchat, unread } = s
   const card = kelement("div", "card")
+  card.id = "chatlist-" + user.id
   const eleft = kelement("div", "left")
   const eright = kelement("div", "right")
   const ecimg = kelement("div", "img")
   const img = new Image()
   img.alt = user.username
-  img.src = user.image || "/assets/user.jpg"
+  img.onerror = () => (img.src = "/assets/user.jpg")
+  img.src = user.image ? `/file/user/${user.image}` : "/assets/user.jpg"
   img.width = 50
   const edetail = kelement("div", "detail")
   const eusername = kelement("div", "name", { e: `<div class="name"><p>${user.username}</p></div>` })
@@ -66,7 +71,8 @@ function chat_card(s: ChatCard): { [key: string]: HTMLDivElement } {
   eleft.append(ecimg, edetail)
   ecimg.append(img)
   edetail.append(eusername, elastchat)
-  eright.append(elastts, eunread)
+  eright.append(elastts)
+  if (unread >= 1) eright.append(unread.toString())
 
   return { card, eusername, elastchat, elastts, eunread }
 }
@@ -87,22 +93,34 @@ export default class Chats implements PrimaryClass {
   }
   private btnListener(): void {}
   private writeChatList(): void {
-    const cdb: ChatsDB[] = Object.values(db.c || {}).sort((a, b) => {
-      const cdba = Object.values(a.c)
-      const cdbb = Object.values(b.c)
-      if (cdba[cdba.length - 1].timestamp > cdbb[cdbb.length - 1].timestamp) return 1
-      if (cdba[cdba.length - 1].timestamp < cdbb[cdbb.length - 1].timestamp) return -1
+    const cdb: ChatsDB[] = db.c.sort((a, b) => {
+      if (a.c[a.c.length - 1].timestamp < b.c[b.c.length - 1].timestamp) return 1
+      if (a.c[a.c.length - 1].timestamp > b.c[b.c.length - 1].timestamp) return -1
       return 0
     })
     cdb.forEach((ch) => {
-      const user = ch.u
-      const inbox = Object.values(ch.c)
-      const unread = inbox.filter((ct) => {
-        return ct.userid !== db.me.id && ct.type !== "deleted" && !ct.watch?.includes(<string>db.me.id)
+      const user = ch.u.find((usr) => usr.id !== db.me.id)
+      if (!user) return
+      // const inbox = Object.values(ch.c)
+      const unread = ch.c.filter((ct) => {
+        return ct.userid !== db.me.id && ct.type !== "deleted" && !ct.watch?.includes(db.me.id)
       }).length
 
-      const lastchat = inbox[inbox.length - 1]
+      const lastchat = ch.c[ch.c.length - 1]
       const { card } = chat_card({ user, lastchat, unread })
+      card.onclick = () => {
+        const roomDetail: RoomDetail = {
+          type: "user",
+          id: user.id,
+          name: {
+            short: user.username,
+            full: user.displayname
+          }
+        }
+        if (user.badges) roomDetail.badges = user.badges
+        if (user.image) roomDetail.img = user.image
+        swiper(new Room({ data: roomDetail, users: [user] }), userState.currcontent)
+      }
       this.card_list.append(card)
     })
 
@@ -138,7 +156,7 @@ export default class Chats implements PrimaryClass {
     this.isLocked = false
     this.el.remove()
   }
-  update(): void {}
+  update(sc: PossibleData, su: PossibleData): void {}
   run(): void {
     userState.center = this
     this.createElement()

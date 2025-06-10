@@ -1,8 +1,8 @@
 import { Databases } from "../types/db.types"
 
 const db: Databases = {
-  c: {},
-  me: {},
+  c: [],
+  me: { id: "waiting", username: "waiting", displayname: "waiting" },
   unread: {}
 }
 

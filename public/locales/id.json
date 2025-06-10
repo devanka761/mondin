@@ -178,5 +178,6 @@
   "SET_ALLOW": "Diizinkan",
   "SET_NOT_ALLOW": "Tidak Diizinkan",
   "SET_ALL_NOTIF": "semua jenis notifikasi",
-  "SET_CHANGE_RULE": "Ganti Izin"
+  "SET_CHANGE_RULE": "Ganti Izin",
+  "ROOM_TYPE_NOT_FOUND": "ID Room Chat tidak ditemukan"
 }
